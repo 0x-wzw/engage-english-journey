@@ -1,4 +1,3 @@
-
 import Layout from "@/components/Layout";
 import { useState } from "react";
 import { Link } from "react-router-dom";
@@ -40,6 +39,41 @@ const ASSESSMENT_QUESTIONS_BY_LEVEL = {
       speaking: true,
     },
   ],
+  Elementary: [
+    {
+      skill: "reading",
+      question: "What does this sentence mean? 'He walks to school every day.'",
+      options: [
+        "He drives a car to work.",
+        "He goes to school by bus.",
+        "He walks to school each day.",
+        "He plays at school."
+      ],
+      answer: 2
+    },
+    {
+      skill: "writing",
+      question: "Write a sentence about your family.",
+      open: true,
+    },
+    {
+      skill: "listening",
+      question: "Listen and choose what you hear.",
+      audio: "/placeholder.mp3",
+      options: [
+        "They eat dinner together.",
+        "The weather is sunny.",
+        "She has a red balloon.",
+        "I go to the library."
+      ],
+      answer: 0
+    },
+    {
+      skill: "speaking",
+      question: "Say aloud: 'My name is [your name].'",
+      speaking: true,
+    },
+  ],
   Intermediate: [
     {
       skill: "reading",
@@ -75,6 +109,41 @@ const ASSESSMENT_QUESTIONS_BY_LEVEL = {
       speaking: true,
     },
   ],
+  Advanced: [
+    {
+      skill: "reading",
+      question: "Interpret: 'Despite the rain, she managed to arrive on time.'",
+      options: [
+        "She arrived late because of the rain.",
+        "She forgot her umbrella.",
+        "She was on time even though it rained.",
+        "She didn't come at all."
+      ],
+      answer: 2
+    },
+    {
+      skill: "writing",
+      question: "Write a paragraph about a memorable journey you have taken.",
+      open: true,
+    },
+    {
+      skill: "listening",
+      question: "Listen and choose what you hear.",
+      audio: "/placeholder.mp3",
+      options: [
+        "He missed the train due to traffic.",
+        "The project deadline is tomorrow.",
+        "They are celebrating their anniversary.",
+        "I prefer tea over coffee."
+      ],
+      answer: 0
+    },
+    {
+      skill: "speaking",
+      question: "Say aloud: 'Learning a language opens many doors.'",
+      speaking: true,
+    },
+  ]
 };
 
 const LEVELS = Object.keys(ASSESSMENT_QUESTIONS_BY_LEVEL);
