@@ -89,6 +89,14 @@ const Dashboard = () => {
               </div>
             ))}
           </div>
+          <div className="mt-6 flex justify-center">
+            <Link
+              to="/continue-learning"
+              className="text-sm text-primary underline hover:text-[#1277a8] transition story-link font-semibold"
+            >
+              View all curriculums&nbsp;→
+            </Link>
+          </div>
         </div>
         {/* --- End Continue Learning Section --- */}
 
