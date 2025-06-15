@@ -1,4 +1,3 @@
-
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import {
@@ -10,14 +9,15 @@ import {
   DropdownMenuItem
 } from "@/components/ui/dropdown-menu";
 import { LogOut } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 const navItems = [
   { name: "Home", to: "/" },
   { name: "Self Assessment", to: "/self-assessment" },
   { name: "Assessment", to: "/assessment" },
-  { name: "Courses", to: "/continue-learning" }, // Added Courses link
+  { name: "Courses", to: "/continue-learning" },
   { name: "Dashboard", to: "/dashboard" },
+  // Admin link, only shown for admins
 ];
 
 const Layout = ({ children }: { children: React.ReactNode }) => {
@@ -25,6 +25,7 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
   const { user, loading, logout } = useAuth();
   const navigate = useNavigate();
   const [loggingOut, setLoggingOut] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(false);
 
   // Handle logout and optionally redirect to home/login page
   const handleLogout = async () => {
@@ -33,6 +34,22 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
     setLoggingOut(false);
     navigate("/login");
   };
+
+  useEffect(() => {
+    if (loading || !user) {
+      setIsAdmin(false);
+      return;
+    }
+    const checkRole = async () => {
+      try {
+        const { data, error } = await supabase.rpc("has_role", { _user_id: user.id, _role: "admin" });
+        setIsAdmin(!!data);
+      } catch {
+        setIsAdmin(false);
+      }
+    };
+    checkRole();
+  }, [user, loading]);
 
   return (
     <div className="min-h-screen flex flex-col font-sans bg-background">
@@ -53,6 +70,16 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
               {item.name}
             </Link>
           ))}
+          {isAdmin && (
+            <Link
+              to="/admin/courses"
+              className={`text-base font-semibold hover:text-primary transition ${
+                location.pathname === "/admin/courses" ? "underline text-primary" : "text-foreground"
+              }`}
+            >
+              Manage Courses
+            </Link>
+          )}
         </nav>
         {/* Auth button or menu */}
         {loading ? (
