@@ -1,4 +1,3 @@
-
 import { useState, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -23,7 +22,6 @@ type ChatMessage = {
 };
 
 export default function ChatSection() {
-  const [webhookUrl, setWebhookUrl] = useState("");
   const [input, setInput] = useState("");
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [loading, setLoading] = useState(false);
@@ -55,11 +53,6 @@ export default function ChatSection() {
         ...prev,
         { role: "user", content: file.name, type: "file", fileName: file.name, fileUrl: base64file }
       ]);
-      await sendToWebhook({
-        type: "file",
-        fileName: file.name,
-        fileData: base64file,
-      });
       setFileUploading(false);
     };
     reader.readAsDataURL(file);
@@ -89,11 +82,6 @@ export default function ChatSection() {
         ...prev,
         { role: "user", content: "", type: "image", fileName: file.name, fileUrl: base64image }
       ]);
-      await sendToWebhook({
-        type: "image",
-        fileName: file.name,
-        fileData: base64image,
-      });
       setFileUploading(false);
     };
     reader.readAsDataURL(file);
@@ -101,73 +89,19 @@ export default function ChatSection() {
     e.target.value = "";
   };
 
-  const sendToWebhook = async (data: any) => {
-    if (!webhookUrl) {
-      setError("Please enter a valid LLM webhook URL.");
-      return;
-    }
-    setLoading(true);
-    try {
-      const response = await fetch(webhookUrl, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          ...data,
-          messages,
-        }),
-      });
-      if (!response.ok) throw new Error("LLM webhook error.");
-      const result = await response.json();
-      setMessages((prev) => [
-        ...prev,
-        { role: "assistant", content: result.reply || JSON.stringify(result) },
-      ]);
-    } catch (e: any) {
-      setError(e.message || "Failed to contact LLM.");
-    }
-    setLoading(false);
-  };
-
-  // Send text or transcribed voice input to LLM webhook
   const handleSend = async (textToSend?: string) => {
     setError("");
-    if (!webhookUrl) {
-      setError("Please enter a valid LLM webhook URL.");
-      return;
-    }
     const sendText = textToSend ?? input.trim();
     if (!sendText) return;
     setMessages((prev) => [...prev, { role: "user", content: sendText, type: "text" }]);
     setInput("");
+    // Just simulate a reply, or do nothing (since there's no API)
     setLoading(true);
-
-    try {
-      const response = await fetch(webhookUrl, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          messages: [
-            ...messages,
-            { role: "user", content: sendText },
-          ],
-        }),
-      });
-      if (!response.ok) throw new Error("LLM webhook error.");
-      const data = await response.json();
-      setMessages((prev) => [
-        ...prev,
-        { role: "assistant", content: data.reply || JSON.stringify(data) },
-      ]);
-    } catch (e: any) {
-      setError(e.message || "Failed to contact LLM.");
-    }
-    setLoading(false);
+    setTimeout(() => setLoading(false), 500);
   };
 
-  // --- VOICE-to-TEXT (browser only, now marks message as "audio") ---
   const handleVoice = async () => {
     if (recording) {
-      // Stop recording
       mediaRecorderRef.current?.stop();
       setRecording(false);
       return;
@@ -194,25 +128,7 @@ export default function ChatSection() {
             { role: "user", content: "[Voice message]", type: "audio", fileUrl: base64audio }
           ]);
           setLoading(true);
-          try {
-            const response = await fetch(webhookUrl, {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({
-                audio: base64audio,
-                previousMessages: messages,
-              }),
-            });
-            if (!response.ok) throw new Error("LLM webhook error.");
-            const data = await response.json();
-            setMessages((prev) => [
-              ...prev,
-              { role: "assistant", content: data.reply || JSON.stringify(data) },
-            ]);
-          } catch (e: any) {
-            setError(e.message || "Voice chat failed.");
-          }
-          setLoading(false);
+          setTimeout(() => setLoading(false), 500);
         };
         reader.readAsDataURL(audioBlob);
       };
@@ -223,7 +139,6 @@ export default function ChatSection() {
     }
   };
 
-  // ---- Chat UI ----
   return (
     <div className="mb-10 max-w-2xl mx-auto bg-white border border-border rounded-lg shadow px-6 py-5">
       <ReminderBar />
@@ -232,15 +147,7 @@ export default function ChatSection() {
         Practice with Chat
       </h2>
       <div className="mb-2 text-muted-foreground text-sm">
-        Chat in English using text, voice, images, or files! Provide your LLM webhook endpoint below to connect. All practice data stays in your browser.
-      </div>
-      <div className="flex gap-2 mb-4">
-        <Input
-          placeholder="Enter your LLM webhook URL..."
-          value={webhookUrl}
-          onChange={e => setWebhookUrl(e.target.value)}
-          className="flex-1"
-        />
+        Chat in English using text, voice, images, or files! All practice data stays in your browser.
       </div>
       <div className="h-60 overflow-y-auto border border-border rounded bg-accent/40 p-3 mb-4 text-[15px]" style={{ minHeight: 200 }}>
         {messages.length === 0 && (
@@ -253,7 +160,6 @@ export default function ChatSection() {
               ${msg.role === "user" ? "bg-primary text-white rounded-br-sm" : "bg-secondary text-foreground rounded-bl-sm"}
               max-w-[72%] whitespace-pre-line break-words
             `}>
-              {/* Render message depending on type */}
               {msg.type === "image" && msg.fileUrl &&
                 <img src={msg.fileUrl} alt={msg.fileName || "uploaded image"} className="rounded w-full max-w-[250px] max-h-[180px] object-contain mb-1" />}
               {msg.type === "file" && msg.fileUrl &&
@@ -270,7 +176,6 @@ export default function ChatSection() {
               }
               {(msg.type === "audio" && msg.fileUrl) ?
                 <audio src={msg.fileUrl} controls className="w-full mt-1" /> : null}
-              {/* Plain text fallback */}
               {msg.type === "text" || !msg.type ? msg.content : null}
               {msg.role === "user" && (msg.type === "file" || msg.type === "image") && msg.fileName && (
                 <div className="text-xs mt-1">{msg.fileName}</div>
@@ -301,7 +206,7 @@ export default function ChatSection() {
             onClick={() => imageInputRef.current?.click()}
             variant="ghost"
             size="icon"
-            disabled={loading || fileUploading || !webhookUrl}
+            disabled={loading || fileUploading}
             className="p-0"
             title="Send Image"
           >
@@ -320,7 +225,7 @@ export default function ChatSection() {
             onClick={() => fileInputRef.current?.click()}
             variant="ghost"
             size="icon"
-            disabled={loading || fileUploading || !webhookUrl}
+            disabled={loading || fileUploading}
             className="p-0"
             title="Send File"
           >
@@ -337,7 +242,7 @@ export default function ChatSection() {
           <Button
             type="button"
             onClick={handleVoice}
-            disabled={loading || !webhookUrl}
+            disabled={loading}
             variant={recording ? "destructive" : "secondary"}
             className="px-4 py-2"
             title="Send Voice"
@@ -345,10 +250,9 @@ export default function ChatSection() {
             <Mic className={recording ? "animate-pulse" : ""} />
             {recording ? "Stop" : ""}
           </Button>
-          {/* Send */}
           <Button
             type="submit"
-            disabled={loading || !input.trim() || !webhookUrl}
+            disabled={loading || !input.trim()}
             variant="default"
             className="px-4 py-2"
           >
@@ -361,9 +265,8 @@ export default function ChatSection() {
       )}
       {error && <div className="text-destructive mt-2 text-sm">{error}</div>}
       <div className="mt-3 text-xs text-muted-foreground">
-        <b>Note:</b> Supports text, voice, images, and file uploads (max 5MB each). Files/images are sent as <code>base64</code> to your webhook.
+        <b>Note:</b> Supports text, voice, images, and file uploads (max 5MB each). Files/images are stored locally.
       </div>
     </div>
   );
 }
-// ... no other code here
