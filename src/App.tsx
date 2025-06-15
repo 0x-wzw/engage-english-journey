@@ -11,7 +11,6 @@ import SelfAssessment from "./pages/SelfAssessment";
 import Assessment from "./pages/Assessment";
 import Dashboard from "./pages/Dashboard";
 import ContinueLearning from "./pages/ContinueLearning";
-import AdminPage from "./pages/Admin";
 
 const queryClient = new QueryClient();
 
@@ -28,7 +27,6 @@ const App = () => (
           <Route path="/assessment" element={<Assessment />} />
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/continue-learning" element={<ContinueLearning />} />
-          <Route path="/admin" element={<AdminPage />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
