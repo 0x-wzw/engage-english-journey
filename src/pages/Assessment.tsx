@@ -3,61 +3,127 @@ import Layout from "@/components/Layout";
 import { useState } from "react";
 import { Link } from "react-router-dom";
 
-/** Simple demo questions for each type. In production: make customizable */
+// Demo assessment questions grouped by level for extensibility and customizability.
+const ASSESSMENT_QUESTIONS_BY_LEVEL = {
+  Beginner: [
+    {
+      skill: "reading",
+      question: "What does this sentence mean? 'She is reading a book.'",
+      options: [
+        "She is eating a book",
+        "She is running outside",
+        "She is looking at written pages",
+        "She is buying a new bag"
+      ],
+      answer: 2
+    },
+    {
+      skill: "writing",
+      question: "Write a sentence about your favorite hobby.",
+      open: true,
+    },
+    {
+      skill: "listening",
+      question: "Listen and choose what you hear.",
+      audio: "/placeholder.mp3",
+      options: [
+        "The cat is black",
+        "The dog is running",
+        "The rain is heavy",
+        "The car is fast"
+      ],
+      answer: 0
+    },
+    {
+      skill: "speaking",
+      question: "Say aloud: 'I am learning English.'",
+      speaking: true,
+    },
+  ],
+  Intermediate: [
+    {
+      skill: "reading",
+      question: "Choose the correct meaning: 'He will call you back.'",
+      options: [
+        "He will return your phone.",
+        "He will return your call.",
+        "He will call your friend.",
+        "He will block your number."
+      ],
+      answer: 1
+    },
+    {
+      skill: "writing",
+      question: "Write a short email to schedule a meeting.",
+      open: true,
+    },
+    {
+      skill: "listening",
+      question: "Listen and choose what you hear.",
+      audio: "/placeholder.mp3",
+      options: [
+        "She likes apples.",
+        "He reads fast.",
+        "They are watching a movie.",
+        "We finished our homework."
+      ],
+      answer: 2
+    },
+    {
+      skill: "speaking",
+      question: "Say aloud: 'Could you please repeat that?'",
+      speaking: true,
+    },
+  ],
+};
 
-const ASSESSMENT_QUESTIONS = [
-  {
-    skill: "reading",
-    question: "What does this sentence mean? 'She is reading a book.'",
-    options: [
-      "She is eating a book",
-      "She is running outside",
-      "She is looking at written pages",
-      "She is buying a new bag"
-    ],
-    answer: 2
-  },
-  {
-    skill: "writing",
-    question: "Write a sentence about your favorite hobby.",
-    open: true,
-  },
-  {
-    skill: "listening",
-    question: "Listen and choose what you hear.",
-    audio: "/placeholder.mp3", // replace with actual audio when available
-    options: [
-      "The cat is black",
-      "The dog is running",
-      "The rain is heavy",
-      "The car is fast"
-    ],
-    answer: 0
-  },
-  {
-    skill: "speaking",
-    question: "Say aloud: 'I am learning English.'",
-    speaking: true,
-  }
-];
+const LEVELS = Object.keys(ASSESSMENT_QUESTIONS_BY_LEVEL);
 
 type AnswerData = {
   [index: number]: string | number;
 };
 
 const Assessment = () => {
+  const [level, setLevel] = useState(LEVELS[0]);
   const [step, setStep] = useState(0);
   const [answers, setAnswers] = useState<AnswerData>({});
+  // Allows "finish" message
   const [submitted, setSubmitted] = useState(false);
 
-  const question = ASSESSMENT_QUESTIONS[step];
+  // Questions for current level
+  const questions = ASSESSMENT_QUESTIONS_BY_LEVEL[level];
+  const question = questions[step];
 
-  // Handling speaking/audio is placeholder for now, as it's advanced and may need browser permissions/backends.
+  // Reset assessment on level change
+  const handleLevelChange = (evt: React.ChangeEvent<HTMLSelectElement>) => {
+    setLevel(evt.target.value);
+    setStep(0);
+    setAnswers({});
+    setSubmitted(false);
+  };
+
   return (
     <Layout>
       <div className="max-w-2xl mx-auto mt-10 bg-card p-8 rounded-lg shadow-lg border border-border animate-fade-in">
         <h1 className="text-2xl font-bold mb-6 text-primary">Skill Assessment</h1>
-        {step < ASSESSMENT_QUESTIONS.length ? (
+        {/* Level selector */}
+        <div className="mb-6 flex flex-col sm:flex-row gap-2 sm:items-center">
+          <label className="text-lg font-semibold text-muted-foreground" htmlFor="level-select">
+            Select Level:
+          </label>
+          <select
+            id="level-select"
+            className="border border-border rounded p-2 bg-accent font-medium text-base text-foreground focus:outline-none"
+            value={level}
+            onChange={handleLevelChange}
+          >
+            {LEVELS.map(lvl => (
+              <option value={lvl} key={lvl}>{lvl}</option>
+            ))}
+          </select>
+        </div>
+
+        {step < questions.length ? (
           <>
             <div className="mb-6">
               <span className="font-semibold text-lg text-muted-foreground">
@@ -75,7 +141,7 @@ const Assessment = () => {
                 Your browser does not support the audio element.
               </audio>
             )}
-            {/* Choice Q */}
+            {/* Choice Question */}
             {question.options && (
               <div className="grid grid-cols-1 gap-3 w-full">
                 {question.options.map((opt, idx) => (
@@ -120,10 +186,17 @@ const Assessment = () => {
               )}
               <button
                 className="ml-auto px-6 py-2 rounded bg-primary text-white font-semibold hover:bg-[#1277a8] transition"
-                onClick={() => setStep(s => s + 1)}
+                onClick={() => {
+                  if (step === questions.length - 1) {
+                    setSubmitted(true);
+                    setStep(s => s + 1);
+                  } else {
+                    setStep(s => s + 1);
+                  }
+                }}
                 disabled={question.open ? !answers[step] : (question.options ? answers[step] === undefined : false)}
               >
-                {step === ASSESSMENT_QUESTIONS.length - 1 ? "Finish" : "Next"}
+                {step === questions.length - 1 ? "Finish" : "Next"}
               </button>
             </div>
           </>
