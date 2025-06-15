@@ -11,6 +11,7 @@ import SelfAssessment from "./pages/SelfAssessment";
 import Assessment from "./pages/Assessment";
 import Dashboard from "./pages/Dashboard";
 import ContinueLearning from "./pages/ContinueLearning";
+import { AuthProvider } from "@/hooks/useAuth";
 
 const queryClient = new QueryClient();
 
@@ -19,18 +20,20 @@ const App = () => (
     <TooltipProvider>
       <Toaster />
       <Sonner />
-      <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<Index />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/self-assessment" element={<SelfAssessment />} />
-          <Route path="/assessment" element={<Assessment />} />
-          <Route path="/dashboard" element={<Dashboard />} />
-          <Route path="/continue-learning" element={<ContinueLearning />} />
-          {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-      </BrowserRouter>
+      <AuthProvider>
+        <BrowserRouter>
+          <Routes>
+            <Route path="/" element={<Index />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/self-assessment" element={<SelfAssessment />} />
+            <Route path="/assessment" element={<Assessment />} />
+            <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/continue-learning" element={<ContinueLearning />} />
+            {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </BrowserRouter>
+      </AuthProvider>
     </TooltipProvider>
   </QueryClientProvider>
 );
