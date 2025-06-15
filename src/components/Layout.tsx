@@ -5,6 +5,7 @@ const navItems = [
   { name: "Home", to: "/" },
   { name: "Self Assessment", to: "/self-assessment" },
   { name: "Assessment", to: "/assessment" },
+  { name: "Courses", to: "/continue-learning" }, // Added Courses link
   { name: "Dashboard", to: "/dashboard" },
 ];
 
