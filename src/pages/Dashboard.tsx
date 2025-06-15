@@ -1,4 +1,3 @@
-
 import Layout from "@/components/Layout";
 import { Link, useNavigate } from "react-router-dom";
 import { useState } from "react";
@@ -67,9 +66,9 @@ const Dashboard = () => {
           ))}
         </div>
         
-        {/* --- Continue Learning Section --- */}
+        {/* --- Courses Section --- */}
         <div className="mt-12">
-          <h2 className="text-xl font-bold text-primary mb-3">Continue learning</h2>
+          <h2 className="text-xl font-bold text-primary mb-3">Courses</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
             {curriculums.map(curriculum => (
               <div
@@ -94,11 +93,11 @@ const Dashboard = () => {
               to="/continue-learning"
               className="text-sm text-primary underline hover:text-[#1277a8] transition story-link font-semibold"
             >
-              View all curriculums&nbsp;→
+              View all courses&nbsp;→
             </Link>
           </div>
         </div>
-        {/* --- End Continue Learning Section --- */}
+        {/* --- End Courses Section --- */}
 
         <div className="mt-8 flex gap-3">
           <Link
