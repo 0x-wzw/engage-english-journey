@@ -1,5 +1,7 @@
+
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
+import { supabase } from "@/integrations/supabase/client"; // FIX: import supabase
 import {
   DropdownMenu,
   DropdownMenuTrigger,
@@ -17,7 +19,7 @@ const navItems = [
   { name: "Assessment", to: "/assessment" },
   { name: "Courses", to: "/continue-learning" },
   { name: "Dashboard", to: "/dashboard" },
-  // Admin link, only shown for admins
+  // Admin link, only shown for admins or super_admins
 ];
 
 const Layout = ({ children }: { children: React.ReactNode }) => {
@@ -42,8 +44,10 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
     }
     const checkRole = async () => {
       try {
-        const { data, error } = await supabase.rpc("has_role", { _user_id: user.id, _role: "admin" });
-        setIsAdmin(!!data);
+        // Check for both 'admin' and 'super_admin'
+        const { data: isAdminData } = await supabase.rpc("has_role", { _user_id: user.id, _role: "admin" });
+        const { data: isSuperAdminData } = await supabase.rpc("has_role", { _user_id: user.id, _role: "super_admin" });
+        setIsAdmin(Boolean(isAdminData) || Boolean(isSuperAdminData));
       } catch {
         setIsAdmin(false);
       }
@@ -78,6 +82,16 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
               }`}
             >
               Manage Courses
+            </Link>
+          )}
+          {isAdmin && (
+            <Link
+              to="/admin/api-keys"
+              className={`text-base font-semibold hover:text-primary transition ${
+                location.pathname === "/admin/api-keys" ? "underline text-primary" : "text-foreground"
+              }`}
+            >
+              API Key Management
             </Link>
           )}
         </nav>
@@ -123,3 +137,4 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
 };
 
 export default Layout;
+

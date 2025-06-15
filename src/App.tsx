@@ -1,3 +1,4 @@
+
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -12,6 +13,7 @@ import Assessment from "./pages/Assessment";
 import Dashboard from "./pages/Dashboard";
 import ContinueLearning from "./pages/ContinueLearning";
 import CoursesAdmin from "./pages/admin/CoursesAdmin";
+import APIKeyManagement from "./pages/admin/APIKeyManagement";
 import { AuthProvider } from "@/hooks/useAuth";
 
 const queryClient = new QueryClient();
@@ -31,6 +33,7 @@ const App = () => (
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/continue-learning" element={<ContinueLearning />} />
             <Route path="/admin/courses" element={<CoursesAdmin />} />
+            <Route path="/admin/api-keys" element={<APIKeyManagement />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
