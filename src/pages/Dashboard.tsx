@@ -71,7 +71,7 @@ const Dashboard = () => {
             to="/assessment"
             className="px-6 py-2 bg-primary text-white rounded font-semibold hover:bg-[#1277a8] transition"
           >
-            Continue Learning
+            Assessment
           </Link>
           <Link
             to="/self-assessment"
