@@ -1,6 +1,8 @@
+
 import Layout from "@/components/Layout";
 import { Link, useNavigate } from "react-router-dom";
 import { useState } from "react";
+import ChatSection from "@/components/ChatSection";
 
 // TODO: Replace fake data with Supabase-backed progress and results.
 const exampleProgress = [
@@ -40,7 +42,8 @@ const Dashboard = () => {
 
   return (
     <Layout>
-      <div className="max-w-3xl mx-auto mt-12 bg-card p-8 rounded-lg shadow-xl border border-border">
+      <ChatSection />
+      <div className="max-w-3xl mx-auto mt-6 bg-card p-8 rounded-lg shadow-xl border border-border">
         <h1 className="text-2xl font-bold mb-4 text-primary">Your Dashboard</h1>
         <div className="mb-4 text-muted-foreground">
           Welcome! Here you’ll see your progress and learning journey. <br />
