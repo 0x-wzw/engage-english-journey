@@ -4,6 +4,9 @@ import { useState } from "react";
 
 const Login = () => {
   const [mode, setMode] = useState<"login" | "register">("login");
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
+
   // TODO: Replace auth logic with Supabase integration after backend is connected
 
   return (
@@ -20,6 +23,34 @@ const Login = () => {
             alert("Login/signup is not available until you connect Supabase.");
           }}
         >
+          {mode === "register" && (
+            <>
+              <div>
+                <label className="block text-sm font-medium mb-1" htmlFor="firstName">First Name</label>
+                <input
+                  required
+                  className="w-full px-4 py-2 border border-border rounded focus:ring-2 focus:ring-accent"
+                  id="firstName"
+                  type="text"
+                  value={firstName}
+                  onChange={e => setFirstName(e.target.value)}
+                  autoComplete="given-name"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-1" htmlFor="lastName">Last Name</label>
+                <input
+                  required
+                  className="w-full px-4 py-2 border border-border rounded focus:ring-2 focus:ring-accent"
+                  id="lastName"
+                  type="text"
+                  value={lastName}
+                  onChange={e => setLastName(e.target.value)}
+                  autoComplete="family-name"
+                />
+              </div>
+            </>
+          )}
           <div>
             <label className="block text-sm font-medium mb-1" htmlFor="email">Email</label>
             <input required className="w-full px-4 py-2 border border-border rounded focus:ring-2 focus:ring-accent" id="email" type="email" />
