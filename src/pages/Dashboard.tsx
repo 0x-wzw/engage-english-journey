@@ -1,3 +1,4 @@
+
 import Layout from "@/components/Layout";
 import { Link, useNavigate } from "react-router-dom";
 import { useState } from "react";
@@ -65,39 +66,6 @@ const Dashboard = () => {
             </div>
           ))}
         </div>
-        
-        {/* --- Courses Section --- */}
-        <div className="mt-12">
-          <h2 className="text-xl font-bold text-primary mb-3">Courses</h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-            {curriculums.map(curriculum => (
-              <div
-                key={curriculum.level}
-                className="bg-accent p-6 rounded-lg border border-border shadow flex flex-col justify-between"
-              >
-                <div>
-                  <div className="font-semibold text-lg text-foreground mb-1">{curriculum.level}</div>
-                  <div className="text-muted-foreground text-[15px] mb-4">{curriculum.summary}</div>
-                </div>
-                <button
-                  onClick={() => handleStartLevel(curriculum.level)}
-                  className="mt-auto px-4 py-2 bg-primary text-white rounded hover:bg-[#1277a8] transition text-sm font-semibold"
-                >
-                  {`Start ${curriculum.level}`}
-                </button>
-              </div>
-            ))}
-          </div>
-          <div className="mt-6 flex justify-center">
-            <Link
-              to="/continue-learning"
-              className="text-sm text-primary underline hover:text-[#1277a8] transition story-link font-semibold"
-            >
-              View all courses&nbsp;→
-            </Link>
-          </div>
-        </div>
-        {/* --- End Courses Section --- */}
 
         <div className="mt-8 flex gap-3">
           <Link
@@ -117,8 +85,43 @@ const Dashboard = () => {
           <span>Tip: Your dashboard updates whenever you finish a self-assessment or skill test.</span>
         </div>
       </div>
+
+      {/* --- Courses Section moved to its own card below the dashboard --- */}
+      <div className="max-w-3xl mx-auto mt-10 bg-card p-8 rounded-lg shadow-xl border border-border">
+        <h2 className="text-xl font-bold text-primary mb-3">Courses</h2>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+          {curriculums.map(curriculum => (
+            <div
+              key={curriculum.level}
+              className="bg-accent p-6 rounded-lg border border-border shadow flex flex-col justify-between"
+            >
+              <div>
+                <div className="font-semibold text-lg text-foreground mb-1">{curriculum.level}</div>
+                <div className="text-muted-foreground text-[15px] mb-4">{curriculum.summary}</div>
+              </div>
+              <button
+                onClick={() => handleStartLevel(curriculum.level)}
+                className="mt-auto px-4 py-2 bg-primary text-white rounded hover:bg-[#1277a8] transition text-sm font-semibold"
+              >
+                {`Start ${curriculum.level}`}
+              </button>
+            </div>
+          ))}
+        </div>
+        <div className="mt-6 flex justify-center">
+          <Link
+            to="/continue-learning"
+            className="text-sm text-primary underline hover:text-[#1277a8] transition story-link font-semibold"
+          >
+            View all courses&nbsp;→
+          </Link>
+        </div>
+      </div>
+      {/* --- End Courses Section --- */}
+
     </Layout>
   );
 };
 
 export default Dashboard;
+
