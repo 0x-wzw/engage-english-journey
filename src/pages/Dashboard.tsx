@@ -1,6 +1,7 @@
 
 import Layout from "@/components/Layout";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { useState } from "react";
 
 // TODO: Replace fake data with Supabase-backed progress and results.
 const exampleProgress = [
@@ -10,7 +11,34 @@ const exampleProgress = [
   { skill: "Speaking",  self: 4, actual: 2, progress: 40 }
 ];
 
+// Curriculum data by level
+const curriculums = [
+  { 
+    level: "Beginner", 
+    summary: "Basic greetings, daily expressions, ABCs, numbers, simple sentences." 
+  },
+  { 
+    level: "Elementary", 
+    summary: "Talking about yourself, asking questions, basic reading, simple writing." 
+  },
+  { 
+    level: "Intermediate", 
+    summary: "Short stories, conversations, practical writing, basic listening comprehension." 
+  },
+  { 
+    level: "Advanced", 
+    summary: "Long readings, written arguments, fluent conversation, listening to podcasts." 
+  },
+];
+
 const Dashboard = () => {
+  const navigate = useNavigate();
+
+  // Handler for direct navigation to assessment with selected level (pass as search query for simplicity)
+  const handleStartLevel = (level: string) => {
+    navigate(`/assessment?level=${encodeURIComponent(level)}`);
+  };
+
   return (
     <Layout>
       <div className="max-w-3xl mx-auto mt-12 bg-card p-8 rounded-lg shadow-xl border border-border">
@@ -38,6 +66,32 @@ const Dashboard = () => {
             </div>
           ))}
         </div>
+        
+        {/* --- Continue Learning Section --- */}
+        <div className="mt-12">
+          <h2 className="text-xl font-bold text-primary mb-3">Continue learning</h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+            {curriculums.map(curriculum => (
+              <div
+                key={curriculum.level}
+                className="bg-accent p-6 rounded-lg border border-border shadow flex flex-col justify-between"
+              >
+                <div>
+                  <div className="font-semibold text-lg text-foreground mb-1">{curriculum.level}</div>
+                  <div className="text-muted-foreground text-[15px] mb-4">{curriculum.summary}</div>
+                </div>
+                <button
+                  onClick={() => handleStartLevel(curriculum.level)}
+                  className="mt-auto px-4 py-2 bg-primary text-white rounded hover:bg-[#1277a8] transition text-sm font-semibold"
+                >
+                  {`Start ${curriculum.level}`}
+                </button>
+              </div>
+            ))}
+          </div>
+        </div>
+        {/* --- End Continue Learning Section --- */}
+
         <div className="mt-8 flex gap-3">
           <Link
             to="/assessment"
