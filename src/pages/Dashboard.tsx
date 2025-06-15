@@ -1,8 +1,8 @@
-
 import Layout from "@/components/Layout";
 import { Link, useNavigate } from "react-router-dom";
 import { useState } from "react";
 import ChatSection from "@/components/ChatSection";
+import { useAuthWithRoles } from "@/hooks/useAuthWithRoles";
 
 // TODO: Replace fake data with Supabase-backed progress and results.
 const exampleProgress = [
@@ -34,6 +34,7 @@ const curriculums = [
 
 const Dashboard = () => {
   const navigate = useNavigate();
+  const { user, roles, hasRole } = useAuthWithRoles();
 
   // Handler for direct navigation to assessment with selected level (pass as search query for simplicity)
   const handleStartLevel = (level: string) => {
@@ -43,6 +44,19 @@ const Dashboard = () => {
   return (
     <Layout>
       <ChatSection />
+      {/* Add super admin roles CLI for demonstration */}
+      {hasRole && hasRole("super_admin") && (
+        <div className="max-w-2xl mx-auto mt-6 mb-6 bg-yellow-100 border border-yellow-300 rounded p-4 text-yellow-900">
+          <div className="font-bold mb-2">Super Admin Notice:</div>
+          <div className="text-sm">
+            Visit{" "}
+            <a href="/admin" className="text-blue-700 underline">
+              /admin
+            </a>{" "}
+            to manage user roles and, soon, API keys & monitoring!
+          </div>
+        </div>
+      )}
       <div className="max-w-3xl mx-auto mt-6 bg-card p-8 rounded-lg shadow-xl border border-border">
         <h1 className="text-2xl font-bold mb-4 text-primary">Your Dashboard</h1>
         <div className="mb-4 text-muted-foreground">
