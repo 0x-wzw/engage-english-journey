@@ -1,10 +1,13 @@
+
 import Layout from "@/components/Layout";
 import { useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { useTranslation } from "@/contexts/TranslationContext";
 
 const ContinueLearning = () => {
   const navigate = useNavigate();
+  const { t } = useTranslation();
 
   const { data: courses, isLoading, error } = useQuery({
     queryKey: ["courses"],
@@ -22,16 +25,16 @@ const ContinueLearning = () => {
   return (
     <Layout>
       <div className="max-w-3xl mx-auto mt-10 bg-card p-8 rounded-lg shadow-xl border border-border animate-fade-in">
-        <h1 className="text-2xl font-bold mb-4 text-primary">Continue Learning</h1>
+        <h1 className="text-2xl font-bold mb-4 text-primary">{t('continueLearning.title')}</h1>
         <div className="mb-6 text-muted-foreground text-lg">
-          Choose a level to start or continue your English learning journey!
+          {t('continueLearning.subtitle')}
         </div>
         {error && (
-          <div className="text-destructive mb-4">Failed to load courses: {error.message}</div>
+          <div className="text-destructive mb-4">{t('continueLearning.errorLoading')} {error.message}</div>
         )}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-7">
           {isLoading ? (
-            <div className="col-span-2 text-center text-muted-foreground">Loading courses...</div>
+            <div className="col-span-2 text-center text-muted-foreground">{t('continueLearning.loadingCourses')}</div>
           ) : (courses && courses.length > 0 ? (
             courses.map((curriculum: any) => (
               <div
@@ -46,16 +49,16 @@ const ContinueLearning = () => {
                   onClick={() => handleStartLevel(curriculum.level)}
                   className="mt-auto px-4 py-2 bg-primary text-white rounded hover:bg-[#1277a8] transition text-sm font-semibold"
                 >
-                  {`Start ${curriculum.level}`}
+                  {`${t('continueLearning.start')} ${curriculum.level}`}
                 </button>
               </div>
             ))
           ) : (
-            <div className="col-span-2 text-center text-muted-foreground">No courses available yet.</div>
+            <div className="col-span-2 text-center text-muted-foreground">{t('continueLearning.noCourses')}</div>
           ))}
         </div>
         <div className="mt-8 text-xs text-muted-foreground text-center italic">
-          (Your progress will be saved when you finish assessments for each level!)
+          {t('continueLearning.progressNote')}
         </div>
       </div>
     </Layout>

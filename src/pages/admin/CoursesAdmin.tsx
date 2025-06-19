@@ -10,6 +10,7 @@ import {
   Table, TableHeader, TableBody, TableHead, TableRow, TableCell
 } from "@/components/ui/table";
 import { toast } from "@/hooks/use-toast";
+import { useTranslation } from "@/contexts/TranslationContext";
 
 interface Course {
   id: string;
@@ -27,6 +28,7 @@ export default function CoursesAdmin() {
   const [formCourse, setFormCourse] = useState<{ id?: string; level: string; summary: string }>({ ...emptyCourse });
   const [isEditing, setIsEditing] = useState(false);
   const [saving, setSaving] = useState(false);
+  const { t } = useTranslation();
 
   // Only allow admins (enforced in RLS, but we also check here for better UX)
   const [notAdmin, setNotAdmin] = useState(false);
@@ -112,15 +114,15 @@ export default function CoursesAdmin() {
   };
 
   if (loading) {
-    return <Layout><div>Loading...</div></Layout>;
+    return <Layout><div>{t('auth.loading')}</div></Layout>;
   }
 
   if (notAdmin) {
     return (
       <Layout>
         <div className="max-w-lg mx-auto bg-destructive/10 border border-destructive/30 text-destructive p-6 mt-10 rounded text-center">
-          <div className="font-bold text-xl mb-2">Access Denied</div>
-          <div>You must be an admin to manage courses.</div>
+          <div className="font-bold text-xl mb-2">{t('admin.accessDenied')}</div>
+          <div>{t('admin.mustBeAdmin')}</div>
         </div>
       </Layout>
     );
@@ -129,14 +131,14 @@ export default function CoursesAdmin() {
   return (
     <Layout>
       <div className="max-w-2xl mx-auto bg-card border border-border rounded-lg p-8 mt-8 shadow-md animate-fade-in">
-        <h1 className="text-2xl font-bold mb-4 text-primary">Courses Management</h1>
+        <h1 className="text-2xl font-bold mb-4 text-primary">{t('admin.coursesTitle')}</h1>
         <form
           onSubmit={handleSave}
           className="flex flex-col gap-3 mb-7 bg-muted/30 rounded p-4 border"
         >
           <div className="flex gap-3 flex-col sm:flex-row">
             <Input
-              placeholder="Level"
+              placeholder={t('admin.level')}
               name="level"
               value={formCourse.level}
               onChange={handleChange}
@@ -145,7 +147,7 @@ export default function CoursesAdmin() {
               maxLength={50}
             />
             <Textarea
-              placeholder="Summary"
+              placeholder={t('admin.summary')}
               name="summary"
               value={formCourse.summary}
               onChange={handleChange}
@@ -157,7 +159,7 @@ export default function CoursesAdmin() {
           </div>
           <div className="flex gap-2">
             <Button type="submit" disabled={saving} className="px-6">
-              {isEditing ? "Update" : "Add Course"}
+              {isEditing ? t('admin.update') : t('admin.add')}
             </Button>
             {isEditing && (
               <Button
@@ -165,7 +167,7 @@ export default function CoursesAdmin() {
                 variant="secondary"
                 onClick={() => { setFormCourse({ ...emptyCourse }); setIsEditing(false); }}
               >
-                Cancel
+                {t('admin.cancel')}
               </Button>
             )}
           </div>
@@ -173,9 +175,9 @@ export default function CoursesAdmin() {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>Level</TableHead>
-              <TableHead>Summary</TableHead>
-              <TableHead className="w-24">Actions</TableHead>
+              <TableHead>{t('admin.level')}</TableHead>
+              <TableHead>{t('admin.summary')}</TableHead>
+              <TableHead className="w-24">{t('admin.actions')}</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -185,15 +187,15 @@ export default function CoursesAdmin() {
                 <TableCell>{course.summary}</TableCell>
                 <TableCell>
                   <div className="flex gap-1">
-                    <Button size="sm" variant="outline" onClick={() => handleEdit(course)}>Edit</Button>
-                    <Button size="sm" variant="destructive" onClick={() => handleDelete(course.id)}>Delete</Button>
+                    <Button size="sm" variant="outline" onClick={() => handleEdit(course)}>{t('admin.edit')}</Button>
+                    <Button size="sm" variant="destructive" onClick={() => handleDelete(course.id)}>{t('admin.delete')}</Button>
                   </div>
                 </TableCell>
               </TableRow>
             ))}
             {courses.length === 0 && (
               <TableRow>
-                <TableCell colSpan={3} className="text-center text-muted-foreground">No courses yet.</TableCell>
+                <TableCell colSpan={3} className="text-center text-muted-foreground">{t('admin.noCourses')}</TableCell>
               </TableRow>
             )}
           </TableBody>

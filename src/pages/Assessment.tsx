@@ -1,6 +1,7 @@
 import Layout from "@/components/Layout";
 import { useState } from "react";
 import { Link } from "react-router-dom";
+import { useTranslation } from "@/contexts/TranslationContext";
 
 // Demo assessment questions grouped by level for extensibility and customizability.
 const ASSESSMENT_QUESTIONS_BY_LEVEL = {
@@ -158,6 +159,7 @@ const Assessment = () => {
   const [answers, setAnswers] = useState<AnswerData>({});
   // Allows "finish" message
   const [submitted, setSubmitted] = useState(false);
+  const { t } = useTranslation();
 
   // Questions for current level
   const questions = ASSESSMENT_QUESTIONS_BY_LEVEL[level];
@@ -174,11 +176,11 @@ const Assessment = () => {
   return (
     <Layout>
       <div className="max-w-2xl mx-auto mt-10 bg-card p-8 rounded-lg shadow-lg border border-border animate-fade-in">
-        <h1 className="text-2xl font-bold mb-6 text-primary">Skill Assessment</h1>
+        <h1 className="text-2xl font-bold mb-6 text-primary">{t('assessment.title')}</h1>
         {/* Level selector */}
         <div className="mb-6 flex flex-col sm:flex-row gap-2 sm:items-center">
           <label className="text-lg font-semibold text-muted-foreground" htmlFor="level-select">
-            Select Level:
+            {t('assessment.selectLevel')}
           </label>
           <select
             id="level-select"
@@ -196,10 +198,10 @@ const Assessment = () => {
           <>
             <div className="mb-6">
               <span className="font-semibold text-lg text-muted-foreground">
-                {question.skill === "reading" && "Reading"}
-                {question.skill === "writing" && "Writing"}
-                {question.skill === "listening" && "Listening"}
-                {question.skill === "speaking" && "Speaking"}
+                {question.skill === "reading" && t('assessment.reading')}
+                {question.skill === "writing" && t('assessment.writing')}
+                {question.skill === "listening" && t('assessment.listening')}
+                {question.skill === "speaking" && t('assessment.speaking')}
               </span>
             </div>
             <div className="mb-5 text-lg text-foreground">{question.question}</div>
@@ -250,7 +252,7 @@ const Assessment = () => {
                   className="px-4 py-2 rounded bg-secondary font-semibold text-foreground hover:bg-[#74d0aa] transition"
                   onClick={() => setStep(s => s - 1)}
                 >
-                  ← Back
+                  {t('assessment.back')}
                 </button>
               )}
               <button
@@ -265,16 +267,16 @@ const Assessment = () => {
                 }}
                 disabled={question.open ? !answers[step] : (question.options ? answers[step] === undefined : false)}
               >
-                {step === questions.length - 1 ? "Finish" : "Next"}
+                {step === questions.length - 1 ? t('assessment.finish') : t('assessment.next')}
               </button>
             </div>
           </>
         ) : (
           <div className="flex flex-col items-center animate-fade-in mt-10">
-            <div className="text-xl font-bold text-accent-foreground mb-2">Assessment Complete!</div>
-            <div className="mb-3 text-muted-foreground">Great job taking the first step! Your progress will appear in your dashboard.</div>
+            <div className="text-xl font-bold text-accent-foreground mb-2">{t('assessment.complete')}</div>
+            <div className="mb-3 text-muted-foreground">{t('assessment.completeMsg')}</div>
             <Link to="/dashboard" className="underline text-primary text-lg hover:text-[#1277a8] transition">
-              View Dashboard
+              {t('assessment.viewDashboard')}
             </Link>
           </div>
         )}

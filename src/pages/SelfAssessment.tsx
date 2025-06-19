@@ -2,21 +2,19 @@
 import Layout from "@/components/Layout";
 import { useState } from "react";
 import { Link } from "react-router-dom";
-
-const skills = [
-  { id: "reading", label: "Reading 📚" },
-  { id: "writing", label: "Writing ✏️" },
-  { id: "listening", label: "Listening 🎧" },
-  { id: "speaking", label: "Speaking 🗣️" },
-];
-
-export type SelfAssessmentResult = {
-  [skill: string]: number;
-};
+import { useTranslation } from "@/contexts/TranslationContext";
 
 const SelfAssessment = () => {
-  const [result, setResult] = useState<SelfAssessmentResult>({});
+  const [result, setResult] = useState<{[skill: string]: number}>({});
   const [submitted, setSubmitted] = useState(false);
+  const { t } = useTranslation();
+
+  const skills = [
+    { id: "reading", label: t('skills.reading') },
+    { id: "writing", label: t('skills.writing') },
+    { id: "listening", label: t('skills.listening') },
+    { id: "speaking", label: t('skills.speaking') },
+  ];
 
   const handleChange = (skill: string, value: number) => {
     setResult((prev) => ({ ...prev, [skill]: value }));
@@ -31,8 +29,8 @@ const SelfAssessment = () => {
   return (
     <Layout>
       <div className="max-w-2xl mx-auto mt-10 bg-card p-8 rounded-lg shadow-lg border border-border">
-        <h1 className="text-2xl font-bold mb-6 text-primary">Self Assessment</h1>
-        <p className="mb-6 text-muted-foreground">How do you rate yourself in each skill? (1 = Just starting, 5 = Very confident)</p>
+        <h1 className="text-2xl font-bold mb-6 text-primary">{t('selfAssessment.title')}</h1>
+        <p className="mb-6 text-muted-foreground">{t('selfAssessment.subtitle')}</p>
         <form onSubmit={handleSubmit} className="space-y-8">
           {skills.map(skill => (
             <div key={skill.id} className="flex flex-col gap-2">
@@ -60,19 +58,19 @@ const SelfAssessment = () => {
             className={`w-full bg-primary text-white py-3 rounded-lg font-semibold mt-6 text-lg hover:bg-[#1277a8] transition`}
             disabled={Object.keys(result).length < skills.length}
           >
-            Save & Continue
+            {t('selfAssessment.saveButton')}
           </button>
         </form>
         {submitted && (
           <div className="mt-8 text-center animate-fade-in">
             <div className="font-semibold text-foreground mb-2">
-              Thank you for your honest assessment!
+              {t('selfAssessment.thankYou')}
             </div>
             <Link
               to="/assessment"
               className="underline text-primary text-lg hover:text-[#1277a8] transition"
             >
-              Start the English Skills Test →
+              {t('selfAssessment.startTest')}
             </Link>
           </div>
         )}

@@ -2,10 +2,12 @@
 import Layout from "@/components/Layout";
 import { useAuth } from "@/hooks/useAuth";
 import { useEffect, useState } from "react";
+import { useTranslation } from "@/contexts/TranslationContext";
 
 const APIKeyManagement = () => {
   const { user, loading } = useAuth();
   const [isAdmin, setIsAdmin] = useState(false);
+  const { t } = useTranslation();
 
   useEffect(() => {
     if (!user) return setIsAdmin(false);
@@ -20,12 +22,12 @@ const APIKeyManagement = () => {
     checkRoles();
   }, [user]);
 
-  if (loading) return <Layout><div>Loading...</div></Layout>;
+  if (loading) return <Layout><div>{t('auth.loading')}</div></Layout>;
   if (!isAdmin) return (
     <Layout>
       <div className="max-w-lg mx-auto bg-destructive/10 border border-destructive/30 text-destructive p-6 mt-10 rounded text-center">
-        <div className="font-bold text-xl mb-2">Access Denied</div>
-        <div>You must be an admin or super admin to manage API keys.</div>
+        <div className="font-bold text-xl mb-2">{t('admin.accessDenied')}</div>
+        <div>{t('admin.mustBeAdminApiKeys')}</div>
       </div>
     </Layout>
   );
@@ -35,21 +37,21 @@ const APIKeyManagement = () => {
   return (
     <Layout>
       <div className="max-w-2xl mx-auto bg-card border border-border rounded-lg p-8 mt-8 shadow-md animate-fade-in">
-        <h1 className="text-2xl font-bold mb-6 text-primary">API Key Management</h1>
+        <h1 className="text-2xl font-bold mb-6 text-primary">{t('admin.apiKeysTitle')}</h1>
         <div className="mb-4 text-muted-foreground">
-          Manage API keys for integrations. <br />
-          <span className="italic text-sm">For real-world usage, secure storage (e.g., Edge Functions secrets) should be implemented.</span>
+          {t('admin.apiKeysSubtitle')} <br />
+          <span className="italic text-sm">{t('admin.apiKeysNote')}</span>
         </div>
         <form className="flex flex-col gap-2 max-w-md bg-muted/30 border rounded p-4">
-          <label className="font-semibold text-sm mb-1">Add API Key</label>
-          <input className="border px-2 py-1 rounded" type="text" placeholder="API Key Label" disabled />
-          <input className="border px-2 py-1 rounded" type="text" placeholder="API Key Value" disabled />
+          <label className="font-semibold text-sm mb-1">{t('admin.addApiKey')}</label>
+          <input className="border px-2 py-1 rounded" type="text" placeholder={t('admin.apiKeyLabel')} disabled />
+          <input className="border px-2 py-1 rounded" type="text" placeholder={t('admin.apiKeyValue')} disabled />
           <button className="bg-primary text-white px-4 py-2 rounded w-fit mt-2 opacity-50 cursor-not-allowed" type="button" disabled>
-            Add Key (Demo Only)
+            {t('admin.addKeyDemo')}
           </button>
         </form>
         <div className="mt-6 text-muted-foreground text-sm italic">
-          <div>API key management coming soon: secure store, update, and delete keys in the backend.</div>
+          <div>{t('admin.apiKeysComing')}</div>
         </div>
       </div>
     </Layout>
