@@ -12,15 +12,7 @@ import {
 import { LogOut } from "lucide-react";
 import { useState, useEffect } from "react";
 import LanguageToggle from "./LanguageToggle";
-
-const navItems = [
-  { name: "Home", to: "/" },
-  { name: "Self Assessment", to: "/self-assessment" },
-  { name: "Assessment", to: "/assessment" },
-  { name: "Courses", to: "/continue-learning" },
-  { name: "Dashboard", to: "/dashboard" },
-  // Admin link, only shown for admins or super_admins
-];
+import { useTranslation } from "@/contexts/TranslationContext";
 
 const Layout = ({ children }: { children: React.ReactNode }) => {
   const location = useLocation();
@@ -28,6 +20,15 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
   const navigate = useNavigate();
   const [loggingOut, setLoggingOut] = useState(false);
   const [isAdmin, setIsAdmin] = useState(false);
+  const { t } = useTranslation();
+
+  const navItems = [
+    { name: t('nav.home'), to: "/" },
+    { name: t('nav.selfAssessment'), to: "/self-assessment" },
+    { name: t('nav.assessment'), to: "/assessment" },
+    { name: t('nav.courses'), to: "/continue-learning" },
+    { name: t('nav.dashboard'), to: "/dashboard" },
+  ];
 
   // Handle logout and optionally redirect to home/login page
   const handleLogout = async () => {
@@ -60,7 +61,7 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
       <header className="flex items-center justify-between px-8 py-4 shadow bg-white sticky top-0 z-30">
         <div className="flex items-center gap-2 font-bold text-primary text-2xl">
           <span role="img" aria-label="book">📘</span>
-          Learn English, Relaxed
+          {t('header.title')}
         </div>
         <nav className="flex gap-6">
           {navItems.map(item => (
@@ -81,7 +82,7 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
                 location.pathname === "/admin/courses" ? "underline text-primary" : "text-foreground"
               }`}
             >
-              Manage Courses
+              {t('nav.manageCourses')}
             </Link>
           )}
           {isAdmin && (
@@ -91,7 +92,7 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
                 location.pathname === "/admin/api-keys" ? "underline text-primary" : "text-foreground"
               }`}
             >
-              API Key Management
+              {t('nav.apiKeys')}
             </Link>
           )}
         </nav>
@@ -99,12 +100,12 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
           <LanguageToggle />
           {/* Auth button or menu */}
           {loading ? (
-            <span className="text-base text-muted-foreground px-4 py-1 rounded animate-pulse">Loading...</span>
+            <span className="text-base text-muted-foreground px-4 py-1 rounded animate-pulse">{t('auth.loading')}</span>
           ) : user ? (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <button className="text-base font-semibold px-4 py-1 bg-primary text-white rounded shadow hover:scale-105 hover:bg-[#1277a8] transition focus:outline-none">
-                  {user.firstName || user.email || "Account"}
+                  {user.firstName || user.email || t('auth.account')}
                 </button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-52">
@@ -120,20 +121,20 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
                   className="text-destructive flex items-center gap-2 cursor-pointer"
                   disabled={loggingOut}
                 >
-                  <LogOut className="w-4 h-4 mr-2" /> Logout
+                  <LogOut className="w-4 h-4 mr-2" /> {t('auth.logout')}
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
           ) : (
             <Link to="/login" className="text-base font-semibold px-4 py-1 bg-primary text-white rounded shadow hover:scale-105 hover:bg-[#1277a8] transition">
-              Login
+              {t('auth.login')}
             </Link>
           )}
         </div>
       </header>
       <main className="flex-1 max-w-4xl mx-auto w-full p-6">{children}</main>
       <footer className="text-center text-xs text-muted-foreground py-4 bg-secondary">
-        Made with ❤️ for learners everywhere. &copy; {new Date().getFullYear()}
+        {t('footer.text')} &copy; {new Date().getFullYear()}
       </footer>
     </div>
   );

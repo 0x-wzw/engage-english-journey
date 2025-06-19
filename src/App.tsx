@@ -15,6 +15,7 @@ import ContinueLearning from "./pages/ContinueLearning";
 import CoursesAdmin from "./pages/admin/CoursesAdmin";
 import APIKeyManagement from "./pages/admin/APIKeyManagement";
 import { AuthProvider } from "@/hooks/useAuth";
+import { TranslationProvider } from "@/contexts/TranslationContext";
 
 const queryClient = new QueryClient();
 
@@ -23,22 +24,24 @@ const App = () => (
     <TooltipProvider>
       <Toaster />
       <Sonner />
-      <AuthProvider>
-        <BrowserRouter>
-          <Routes>
-            <Route path="/" element={<Index />} />
-            <Route path="/login" element={<Login />} />
-            <Route path="/self-assessment" element={<SelfAssessment />} />
-            <Route path="/assessment" element={<Assessment />} />
-            <Route path="/dashboard" element={<Dashboard />} />
-            <Route path="/continue-learning" element={<ContinueLearning />} />
-            <Route path="/admin/courses" element={<CoursesAdmin />} />
-            <Route path="/admin/api-keys" element={<APIKeyManagement />} />
-            {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </BrowserRouter>
-      </AuthProvider>
+      <TranslationProvider>
+        <AuthProvider>
+          <BrowserRouter>
+            <Routes>
+              <Route path="/" element={<Index />} />
+              <Route path="/login" element={<Login />} />
+              <Route path="/self-assessment" element={<SelfAssessment />} />
+              <Route path="/assessment" element={<Assessment />} />
+              <Route path="/dashboard" element={<Dashboard />} />
+              <Route path="/continue-learning" element={<ContinueLearning />} />
+              <Route path="/admin/courses" element={<CoursesAdmin />} />
+              <Route path="/admin/api-keys" element={<APIKeyManagement />} />
+              {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </BrowserRouter>
+        </AuthProvider>
+      </TranslationProvider>
     </TooltipProvider>
   </QueryClientProvider>
 );

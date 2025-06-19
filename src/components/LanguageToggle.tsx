@@ -1,5 +1,4 @@
 
-import { useState } from "react";
 import { Languages } from "lucide-react";
 import {
   Select,
@@ -8,6 +7,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { useTranslation } from "@/contexts/TranslationContext";
 
 const languages = [
   { code: "en", name: "English", flag: "🇺🇸" },
@@ -21,20 +21,19 @@ const languages = [
 ];
 
 const LanguageToggle = () => {
-  const [selectedLanguage, setSelectedLanguage] = useState("en");
+  const { language, setLanguage } = useTranslation();
 
   const handleLanguageChange = (languageCode: string) => {
-    setSelectedLanguage(languageCode);
-    // Here you would typically integrate with your i18n library
+    setLanguage(languageCode as any);
     console.log(`Language changed to: ${languageCode}`);
   };
 
-  const currentLanguage = languages.find(lang => lang.code === selectedLanguage);
+  const currentLanguage = languages.find(lang => lang.code === language);
 
   return (
     <div className="flex items-center gap-2">
       <Languages className="w-4 h-4 text-muted-foreground" />
-      <Select value={selectedLanguage} onValueChange={handleLanguageChange}>
+      <Select value={language} onValueChange={handleLanguageChange}>
         <SelectTrigger className="w-auto min-w-[120px] border-none shadow-none focus:ring-0">
           <SelectValue>
             <div className="flex items-center gap-2">
