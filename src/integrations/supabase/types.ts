@@ -37,18 +37,21 @@ export type Database = {
         Row: {
           created_at: string | null
           id: string
+          name: string
           role: Database["public"]["Enums"]["app_role"]
           user_id: string
         }
         Insert: {
           created_at?: string | null
           id?: string
+          name?: string
           role: Database["public"]["Enums"]["app_role"]
-          user_id: string
+          user_id?: string
         }
         Update: {
           created_at?: string | null
           id?: string
+          name?: string
           role?: Database["public"]["Enums"]["app_role"]
           user_id?: string
         }
@@ -60,10 +63,10 @@ export type Database = {
     }
     Functions: {
       has_role: {
-        Args: {
-          _user_id: string
-          _role: Database["public"]["Enums"]["app_role"]
-        }
+        Args:
+          | { _user_id: string; _role: Database["public"]["Enums"]["app_role"] }
+          | { _user_id: string; _role: string }
+          | { user_id: number; role_name: string }
         Returns: boolean
       }
     }

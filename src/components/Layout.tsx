@@ -1,7 +1,6 @@
-
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
-import { supabase } from "@/integrations/supabase/client"; // FIX: import supabase
+import { supabase } from "@/integrations/supabase/client";
 import {
   DropdownMenu,
   DropdownMenuTrigger,
@@ -12,6 +11,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { LogOut } from "lucide-react";
 import { useState, useEffect } from "react";
+import LanguageToggle from "./LanguageToggle";
 
 const navItems = [
   { name: "Home", to: "/" },
@@ -95,38 +95,41 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
             </Link>
           )}
         </nav>
-        {/* Auth button or menu */}
-        {loading ? (
-          <span className="text-base text-muted-foreground px-4 py-1 rounded animate-pulse">Loading...</span>
-        ) : user ? (
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <button className="text-base font-semibold px-4 py-1 bg-primary text-white rounded shadow hover:scale-105 hover:bg-[#1277a8] transition focus:outline-none">
-                {user.firstName || user.email || "Account"}
-              </button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-52">
-              <DropdownMenuLabel>
-                <div>
-                  <div className="font-bold">{user.firstName} {user.lastName}</div>
-                  <div className="text-xs text-muted-foreground">{user.email}</div>
-                </div>
-              </DropdownMenuLabel>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem
-                onClick={handleLogout}
-                className="text-destructive flex items-center gap-2 cursor-pointer"
-                disabled={loggingOut}
-              >
-                <LogOut className="w-4 h-4 mr-2" /> Logout
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-        ) : (
-          <Link to="/login" className="text-base font-semibold px-4 py-1 bg-primary text-white rounded shadow hover:scale-105 hover:bg-[#1277a8] transition">
-            Login
-          </Link>
-        )}
+        <div className="flex items-center gap-4">
+          <LanguageToggle />
+          {/* Auth button or menu */}
+          {loading ? (
+            <span className="text-base text-muted-foreground px-4 py-1 rounded animate-pulse">Loading...</span>
+          ) : user ? (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <button className="text-base font-semibold px-4 py-1 bg-primary text-white rounded shadow hover:scale-105 hover:bg-[#1277a8] transition focus:outline-none">
+                  {user.firstName || user.email || "Account"}
+                </button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-52">
+                <DropdownMenuLabel>
+                  <div>
+                    <div className="font-bold">{user.firstName} {user.lastName}</div>
+                    <div className="text-xs text-muted-foreground">{user.email}</div>
+                  </div>
+                </DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem
+                  onClick={handleLogout}
+                  className="text-destructive flex items-center gap-2 cursor-pointer"
+                  disabled={loggingOut}
+                >
+                  <LogOut className="w-4 h-4 mr-2" /> Logout
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          ) : (
+            <Link to="/login" className="text-base font-semibold px-4 py-1 bg-primary text-white rounded shadow hover:scale-105 hover:bg-[#1277a8] transition">
+              Login
+            </Link>
+          )}
+        </div>
       </header>
       <main className="flex-1 max-w-4xl mx-auto w-full p-6">{children}</main>
       <footer className="text-center text-xs text-muted-foreground py-4 bg-secondary">
@@ -137,4 +140,3 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
 };
 
 export default Layout;
-
