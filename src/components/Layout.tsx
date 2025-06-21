@@ -1,3 +1,4 @@
+
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
@@ -9,7 +10,14 @@ import {
   DropdownMenuSeparator,
   DropdownMenuItem
 } from "@/components/ui/dropdown-menu";
-import { LogOut } from "lucide-react";
+import {
+  Drawer,
+  DrawerContent,
+  DrawerHeader,
+  DrawerTitle,
+  DrawerTrigger,
+} from "@/components/ui/drawer";
+import { LogOut, Menu } from "lucide-react";
 import { useState, useEffect } from "react";
 import LanguageToggle from "./LanguageToggle";
 import { useTranslation } from "@/contexts/TranslationContext";
@@ -20,6 +28,7 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
   const navigate = useNavigate();
   const [loggingOut, setLoggingOut] = useState(false);
   const [isAdmin, setIsAdmin] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const { t } = useTranslation();
 
   const navItems = [
@@ -36,6 +45,11 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
     await logout();
     setLoggingOut(false);
     navigate("/login");
+  };
+
+  const handleMobileNavClick = (to: string) => {
+    setMobileMenuOpen(false);
+    navigate(to);
   };
 
   useEffect(() => {
@@ -58,12 +72,14 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
 
   return (
     <div className="min-h-screen flex flex-col font-sans bg-background">
-      <header className="flex items-center justify-between px-8 py-4 shadow bg-white sticky top-0 z-30">
+      <header className="flex items-center justify-between px-4 md:px-8 py-4 shadow bg-white sticky top-0 z-30">
         <div className="flex items-center gap-2 font-bold text-primary text-2xl">
           <span role="img" aria-label="book">📘</span>
           {t('header.title')}
         </div>
-        <nav className="flex gap-6">
+        
+        {/* Desktop Navigation */}
+        <nav className="hidden md:flex gap-6">
           {navItems.map(item => (
             <Link
               key={item.name}
@@ -96,7 +112,87 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
             </Link>
           )}
         </nav>
-        <div className="flex items-center gap-4">
+
+        {/* Mobile Navigation */}
+        <div className="md:hidden">
+          <Drawer open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
+            <DrawerTrigger asChild>
+              <button className="p-2">
+                <Menu className="w-6 h-6" />
+              </button>
+            </DrawerTrigger>
+            <DrawerContent>
+              <DrawerHeader>
+                <DrawerTitle>{t('nav.menu')}</DrawerTitle>
+              </DrawerHeader>
+              <div className="p-4 space-y-4">
+                {navItems.map(item => (
+                  <button
+                    key={item.name}
+                    onClick={() => handleMobileNavClick(item.to)}
+                    className={`block w-full text-left text-base font-semibold py-2 px-4 rounded transition ${
+                      location.pathname === item.to ? "bg-primary text-white" : "text-foreground hover:bg-accent"
+                    }`}
+                  >
+                    {item.name}
+                  </button>
+                ))}
+                {isAdmin && (
+                  <button
+                    onClick={() => handleMobileNavClick("/admin/courses")}
+                    className={`block w-full text-left text-base font-semibold py-2 px-4 rounded transition ${
+                      location.pathname === "/admin/courses" ? "bg-primary text-white" : "text-foreground hover:bg-accent"
+                    }`}
+                  >
+                    {t('nav.manageCourses')}
+                  </button>
+                )}
+                {isAdmin && (
+                  <button
+                    onClick={() => handleMobileNavClick("/admin/api-keys")}
+                    className={`block w-full text-left text-base font-semibold py-2 px-4 rounded transition ${
+                      location.pathname === "/admin/api-keys" ? "bg-primary text-white" : "text-foreground hover:bg-accent"
+                    }`}
+                  >
+                    {t('nav.apiKeys')}
+                  </button>
+                )}
+                <div className="border-t pt-4">
+                  <LanguageToggle />
+                </div>
+                <div className="border-t pt-4">
+                  {loading ? (
+                    <span className="text-base text-muted-foreground px-4 py-2 block">{t('auth.loading')}</span>
+                  ) : user ? (
+                    <div className="space-y-2">
+                      <div className="px-4 py-2">
+                        <div className="font-bold">{user.firstName} {user.lastName}</div>
+                        <div className="text-xs text-muted-foreground">{user.email}</div>
+                      </div>
+                      <button
+                        onClick={handleLogout}
+                        className="w-full text-left text-destructive flex items-center gap-2 px-4 py-2 rounded hover:bg-accent transition"
+                        disabled={loggingOut}
+                      >
+                        <LogOut className="w-4 h-4" /> {t('auth.logout')}
+                      </button>
+                    </div>
+                  ) : (
+                    <button
+                      onClick={() => handleMobileNavClick("/login")}
+                      className="w-full text-left text-base font-semibold px-4 py-2 bg-primary text-white rounded"
+                    >
+                      {t('auth.login')}
+                    </button>
+                  )}
+                </div>
+              </div>
+            </DrawerContent>
+          </Drawer>
+        </div>
+
+        {/* Desktop Auth and Language Toggle */}
+        <div className="hidden md:flex items-center gap-4">
           <LanguageToggle />
           {/* Auth button or menu */}
           {loading ? (

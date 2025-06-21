@@ -1,1023 +1,651 @@
-import React, { createContext, useContext, useState, ReactNode } from 'react';
+import React, { createContext, useContext, useState, useEffect } from 'react';
 
-type Language = 'en' | 'es' | 'fr' | 'de' | 'it' | 'pt' | 'zh' | 'ja';
-
-interface TranslationContextType {
-  language: Language;
-  setLanguage: (lang: Language) => void;
+interface TranslationContextProps {
+  language: string;
+  setLanguage: (language: string) => void;
   t: (key: string) => string;
 }
 
-const TranslationContext = createContext<TranslationContextType | undefined>(undefined);
+const TranslationContext = createContext<TranslationContextProps | undefined>(undefined);
 
 const translations = {
   en: {
-    // Header
-    'header.title': 'Learn English, Relaxed',
-    'nav.home': 'Home',
-    'nav.selfAssessment': 'Self Assessment',
-    'nav.assessment': 'Assessment',
-    'nav.courses': 'Courses',
-    'nav.dashboard': 'Dashboard',
-    'nav.manageCourses': 'Manage Courses',
-    'nav.apiKeys': 'API Key Management',
-    'auth.login': 'Login',
-    'auth.logout': 'Logout',
-    'auth.account': 'Account',
-    'auth.loading': 'Loading...',
-    
-    // Home page
-    'home.title': 'Relaxed English Learning',
-    'home.subtitle': 'Simple, fun English for everyone. Assess yourself, discover your strengths, and learn at your own pace. 🎉',
-    'home.getStarted': 'Get Started',
-    'home.tryAssessment': 'Try Self Assessment',
-    'home.noStress': 'No stress. No pressure. Low-data, always saves your progress!',
-    'home.journeyTitle': 'Your Learning Journey',
-    'home.journey.selfAssessment': 'Self Assessment',
-    'home.journey.skills': 'Reading, Writing, Listening, Speaking',
-    'home.journey.dashboard': 'Dashboard: Track your progress',
-    'home.journey.resume': 'Resume anytime',
-    'home.journey.customized': 'Customized learning',
-    'curriculum.title': 'Sample Curriculum',
-    'curriculum.note': '(Curriculum is customizable for your needs.)',
-    
-    // Footer
-    'footer.text': 'Made with ❤️ for learners everywhere.',
-    
-    // Skills
-    'skills.reading': 'Reading 📚',
-    'skills.writing': 'Writing ✏️',
-    'skills.listening': 'Listening 🎧',
-    'skills.speaking': 'Speaking 🗣️',
-
-    // Login page
-    'login.title': 'Login to Your Account',
-    'login.createAccount': 'Create an Account',
-    'login.firstName': 'First Name',
-    'login.lastName': 'Last Name',
-    'login.email': 'Email',
-    'login.password': 'Password',
-    'login.loginButton': 'Login',
-    'login.signUpButton': 'Sign Up',
-    'login.noAccount': "Don't have an account?",
-    'login.signUpLink': 'Sign up',
-    'login.hasAccount': 'Already have an account?',
-    'login.loginLink': 'Login',
-    'login.note': 'You\'ll need to connect Supabase for authentication features.',
-    'login.docs': 'See Lovable docs for instructions.',
-
-    // Self Assessment page
-    'selfAssessment.title': 'Self Assessment',
-    'selfAssessment.subtitle': 'How do you rate yourself in each skill? (1 = Just starting, 5 = Very confident)',
-    'selfAssessment.saveButton': 'Save & Continue',
-    'selfAssessment.thankYou': 'Thank you for your honest assessment!',
-    'selfAssessment.startTest': 'Start the English Skills Test →',
-
-    // Assessment page
-    'assessment.title': 'Skill Assessment',
-    'assessment.selectLevel': 'Select Level:',
-    'assessment.reading': 'Reading',
-    'assessment.writing': 'Writing',
-    'assessment.listening': 'Listening',
-    'assessment.speaking': 'Speaking',
-    'assessment.back': '← Back',
-    'assessment.next': 'Next',
-    'assessment.finish': 'Finish',
-    'assessment.complete': 'Assessment Complete!',
-    'assessment.completeMsg': 'Great job taking the first step! Your progress will appear in your dashboard.',
-    'assessment.viewDashboard': 'View Dashboard',
-
-    // Dashboard page
-    'dashboard.title': 'Your Dashboard',
-    'dashboard.subtitle': 'Welcome! Here you\'ll see your progress and learning journey.',
-    'dashboard.supabaseNote': '(Connect Supabase to track and save your results!)',
-    'dashboard.progress': 'Progress:',
-    'dashboard.selfAssessment': 'Self assessment:',
-    'dashboard.testScore': 'Test Score:',
-    'dashboard.assessmentButton': 'Assessment',
-    'dashboard.redoSelfAssessment': 'Redo Self-Assessment',
-    'dashboard.viewAllCourses': 'View All Courses',
-    'dashboard.tip': 'Tip: Your dashboard updates whenever you finish a self-assessment or skill test.',
-
-    // Continue Learning page
-    'continueLearning.title': 'Continue Learning',
-    'continueLearning.subtitle': 'Choose a level to start or continue your English learning journey!',
-    'continueLearning.loadingCourses': 'Loading courses...',
-    'continueLearning.noCourses': 'No courses available yet.',
-    'continueLearning.start': 'Start',
-    'continueLearning.progressNote': '(Your progress will be saved when you finish assessments for each level!)',
-    'continueLearning.errorLoading': 'Failed to load courses:',
-
-    // Admin pages
-    'admin.accessDenied': 'Access Denied',
-    'admin.mustBeAdmin': 'You must be an admin to manage courses.',
-    'admin.mustBeAdminApiKeys': 'You must be an admin or super admin to manage API keys.',
-    'admin.coursesTitle': 'Courses Management',
-    'admin.level': 'Level',
-    'admin.summary': 'Summary',
-    'admin.actions': 'Actions',
-    'admin.edit': 'Edit',
-    'admin.delete': 'Delete',
-    'admin.add': 'Add Course',
-    'admin.update': 'Update',
-    'admin.cancel': 'Cancel',
-    'admin.noCourses': 'No courses yet.',
-    'admin.apiKeysTitle': 'API Key Management',
-    'admin.apiKeysSubtitle': 'Manage API keys for integrations.',
-    'admin.apiKeysNote': 'For real-world usage, secure storage (e.g., Edge Functions secrets) should be implemented.',
-    'admin.addApiKey': 'Add API Key',
-    'admin.apiKeyLabel': 'API Key Label',
-    'admin.apiKeyValue': 'API Key Value',
-    'admin.addKeyDemo': 'Add Key (Demo Only)',
-    'admin.apiKeysComing': 'API key management coming soon: secure store, update, and delete keys in the backend.',
-
-    // 404 page
-    'notFound.title': '404',
-    'notFound.message': 'Oops! Page not found',
-    'notFound.returnHome': 'Return to Home',
+    header: {
+      title: "Learning Platform",
+    },
+    nav: {
+      home: "Home",
+      selfAssessment: "Self Assessment",
+      assessment: "Assessment",
+      courses: "Courses",
+      dashboard: "Dashboard",
+      manageCourses: "Manage Courses",
+      apiKeys: "API Keys",
+      menu: "Menu"
+    },
+    home: {
+      title: "Unlock Your Potential with Personalized Learning",
+      subtitle:
+        "Embark on a transformative learning experience tailored to your unique skills and career aspirations. Start with a self-assessment, discover your strengths, and chart a course towards professional growth.",
+      getStarted: "Get Started",
+      tryAssessment: "Try a Self-Assessment",
+      noStress: "No stress, just growth. Take the first step towards a brighter future today!",
+      journeyTitle: "Your Learning Journey",
+      journey: {
+        selfAssessment: "Start with a self-assessment",
+        skills: "Identify key skills to develop",
+        dashboard: "Track your progress on a personalized dashboard",
+        resume: "Build a standout resume",
+        customized: "Get customized learning recommendations"
+      }
+    },
+    auth: {
+      login: "Login",
+      logout: "Logout",
+      account: "Account",
+      loading: "Loading...",
+    },
+    footer: {
+      text: "Empowering Careers Through Knowledge",
+    },
+    selfAssessmentPage: {
+      title: "Self-Assessment",
+      description: "Evaluate your skills and interests to discover suitable career paths.",
+      startAssessment: "Start Assessment",
+      loading: "Loading assessment...",
+      error: "Failed to load assessment.",
+    },
+    assessmentPage: {
+      title: "Assessment",
+      submit: "Submit",
+      next: "Next",
+      previous: "Previous",
+      loading: "Loading questions...",
+      error: "Failed to load questions.",
+    },
+    dashboardPage: {
+      title: "Dashboard",
+      welcome: "Welcome to your personalized dashboard!",
+      progress: "Your Progress",
+      completedCourses: "Completed Courses",
+      recommendedCourses: "Recommended Courses",
+      noCourses: "No courses completed yet.",
+    },
+    continueLearning: {
+      title: "Continue Learning",
+      subtitle: "Explore our curated courses to enhance your skills and advance your career.",
+      loadingCourses: "Loading courses...",
+      errorLoading: "Error loading courses:",
+      noCourses: "No courses available at the moment.",
+      start: "Start",
+      progressNote: "Your progress is saved automatically as you complete each level.",
+    },
+    notFound: {
+      title: "404 - Page Not Found",
+      message: "Oops! The page you are looking for does not exist.",
+      returnHome: "Return to Home",
+    },
   },
   es: {
-    // Header
-    'header.title': 'Aprende Inglés, Relajado',
-    'nav.home': 'Inicio',
-    'nav.selfAssessment': 'Autoevaluación',
-    'nav.assessment': 'Evaluación',
-    'nav.courses': 'Cursos',
-    'nav.dashboard': 'Panel',
-    'nav.manageCourses': 'Gestionar Cursos',
-    'nav.apiKeys': 'Gestión de Claves API',
-    'auth.login': 'Iniciar Sesión',
-    'auth.logout': 'Cerrar Sesión',
-    'auth.account': 'Cuenta',
-    'auth.loading': 'Cargando...',
-    
-    // Home page
-    'home.title': 'Aprendizaje de Inglés Relajado',
-    'home.subtitle': 'Inglés simple y divertido para todos. Evalúate, descubre tus fortalezas y aprende a tu ritmo. 🎉',
-    'home.getStarted': 'Comenzar',
-    'home.tryAssessment': 'Probar Autoevaluación',
-    'home.noStress': '¡Sin estrés. Sin presión. Bajo consumo de datos, siempre guarda tu progreso!',
-    'home.journeyTitle': 'Tu Viaje de Aprendizaje',
-    'home.journey.selfAssessment': 'Autoevaluación',
-    'home.journey.skills': 'Lectura, Escritura, Escucha, Habla',
-    'home.journey.dashboard': 'Panel: Sigue tu progreso',
-    'home.journey.resume': 'Continúa en cualquier momento',
-    'home.journey.customized': 'Aprendizaje personalizado',
-    'curriculum.title': 'Currículo de Muestra',
-    'curriculum.note': '(El currículo es personalizable según tus necesidades.)',
-    
-    // Footer
-    'footer.text': 'Hecho con ❤️ para estudiantes de todo el mundo.',
-    
-    // Skills
-    'skills.reading': 'Lectura 📚',
-    'skills.writing': 'Escritura ✏️',
-    'skills.listening': 'Escucha 🎧',
-    'skills.speaking': 'Habla 🗣️',
-
-    // Login page
-    'login.title': 'Iniciar Sesión en tu Cuenta',
-    'login.createAccount': 'Crear una Cuenta',
-    'login.firstName': 'Nombre',
-    'login.lastName': 'Apellido',
-    'login.email': 'Correo Electrónico',
-    'login.password': 'Contraseña',
-    'login.loginButton': 'Iniciar Sesión',
-    'login.signUpButton': 'Registrarse',
-    'login.noAccount': '¿No tienes una cuenta?',
-    'login.signUpLink': 'Regístrate',
-    'login.hasAccount': '¿Ya tienes una cuenta?',
-    'login.loginLink': 'Iniciar Sesión',
-    'login.note': 'Necesitarás conectar Supabase para las funciones de autenticación.',
-    'login.docs': 'Consulta la documentación de Lovable para instrucciones.',
-
-    // Self Assessment page
-    'selfAssessment.title': 'Autoevaluación',
-    'selfAssessment.subtitle': '¿Cómo te calificas en cada habilidad? (1 = Apenas comenzando, 5 = Muy confiado)',
-    'selfAssessment.saveButton': 'Guardar y Continuar',
-    'selfAssessment.thankYou': '¡Gracias por tu evaluación honesta!',
-    'selfAssessment.startTest': 'Comenzar la Prueba de Habilidades de Inglés →',
-
-    // Assessment page
-    'assessment.title': 'Evaluación de Habilidades',
-    'assessment.selectLevel': 'Seleccionar Nivel:',
-    'assessment.reading': 'Lectura',
-    'assessment.writing': 'Escritura',
-    'assessment.listening': 'Escucha',
-    'assessment.speaking': 'Habla',
-    'assessment.back': '← Atrás',
-    'assessment.next': 'Siguiente',
-    'assessment.finish': 'Finalizar',
-    'assessment.complete': '¡Evaluación Completada!',
-    'assessment.completeMsg': '¡Excelente trabajo dando el primer paso! Tu progreso aparecerá en tu panel.',
-    'assessment.viewDashboard': 'Ver Panel',
-
-    // Dashboard page
-    'dashboard.title': 'Tu Panel',
-    'dashboard.subtitle': '¡Bienvenido! Aquí verás tu progreso y viaje de aprendizaje.',
-    'dashboard.supabaseNote': '(¡Conecta Supabase para rastrear y guardar tus resultados!)',
-    'dashboard.progress': 'Progreso:',
-    'dashboard.selfAssessment': 'Autoevaluación:',
-    'dashboard.testScore': 'Puntuación de Prueba:',
-    'dashboard.assessmentButton': 'Evaluación',
-    'dashboard.redoSelfAssessment': 'Rehacer Autoevaluación',
-    'dashboard.viewAllCourses': 'Ver Todos los Cursos',
-    'dashboard.tip': 'Consejo: Tu panel se actualiza cada vez que terminas una autoevaluación o prueba de habilidades.',
-
-    // Continue Learning page
-    'continueLearning.title': 'Continuar Aprendiendo',
-    'continueLearning.subtitle': '¡Elige un nivel para comenzar o continuar tu viaje de aprendizaje de inglés!',
-    'continueLearning.loadingCourses': 'Cargando cursos...',
-    'continueLearning.noCourses': 'No hay cursos disponibles todavía.',
-    'continueLearning.start': 'Comenzar',
-    'continueLearning.progressNote': '(¡Tu progreso se guardará cuando termines las evaluaciones para cada nivel!)',
-    'continueLearning.errorLoading': 'Error al cargar cursos:',
-
-    // Admin pages
-    'admin.accessDenied': 'Acceso Denegado',
-    'admin.mustBeAdmin': 'Debes ser administrador para gestionar cursos.',
-    'admin.mustBeAdminApiKeys': 'Debes ser administrador o superadministrador para gestionar claves API.',
-    'admin.coursesTitle': 'Gestión de Cursos',
-    'admin.level': 'Nivel',
-    'admin.summary': 'Resumen',
-    'admin.actions': 'Acciones',
-    'admin.edit': 'Editar',
-    'admin.delete': 'Eliminar',
-    'admin.add': 'Agregar Curso',
-    'admin.update': 'Actualizar',
-    'admin.cancel': 'Cancelar',
-    'admin.noCourses': 'No hay cursos todavía.',
-    'admin.apiKeysTitle': 'Gestión de Claves API',
-    'admin.apiKeysSubtitle': 'Gestionar claves API para integraciones.',
-    'admin.apiKeysNote': 'Para uso en el mundo real, se debe implementar almacenamiento seguro (ej. secretos de Edge Functions).',
-    'admin.addApiKey': 'Agregar Clave API',
-    'admin.apiKeyLabel': 'Etiqueta de Clave API',
-    'admin.apiKeyValue': 'Valor de Clave API',
-    'admin.addKeyDemo': 'Agregar Clave (Solo Demo)',
-    'admin.apiKeysComing': 'Gestión de claves API próximamente: almacenar, actualizar y eliminar claves de forma segura en el backend.',
-
-    // 404 page
-    'notFound.title': '404',
-    'notFound.message': '¡Ups! Página no encontrada',
-    'notFound.returnHome': 'Volver al Inicio',
+    header: {
+      title: "Plataforma de Aprendizaje",
+    },
+    nav: {
+      home: "Inicio",
+      selfAssessment: "Autoevaluación",
+      assessment: "Evaluación",
+      courses: "Cursos",
+      dashboard: "Panel",
+      manageCourses: "Gestionar Cursos",
+      apiKeys: "Claves API",
+      menu: "Menú"
+    },
+    home: {
+      title: "Desbloquea Tu Potencial con Aprendizaje Personalizado",
+      subtitle:
+        "Embárcate en una experiencia de aprendizaje transformadora adaptada a tus habilidades y aspiraciones profesionales. Comienza con una autoevaluación, descubre tus fortalezas y traza un curso hacia el crecimiento profesional.",
+      getStarted: "Comenzar",
+      tryAssessment: "Probar una Autoevaluación",
+      noStress: "Sin estrés, solo crecimiento. ¡Da el primer paso hacia un futuro mejor hoy!",
+      journeyTitle: "Tu Viaje de Aprendizaje",
+      journey: {
+        selfAssessment: "Comienza con una autoevaluación",
+        skills: "Identifica habilidades clave para desarrollar",
+        dashboard: "Sigue tu progreso en un panel personalizado",
+        resume: "Construye un currículum destacado",
+        customized: "Obtén recomendaciones de aprendizaje personalizadas"
+      }
+    },
+    auth: {
+      login: "Iniciar Sesión",
+      logout: "Cerrar Sesión",
+      account: "Cuenta",
+      loading: "Cargando...",
+    },
+    footer: {
+      text: "Impulsando Carreras a Través del Conocimiento",
+    },
+    selfAssessmentPage: {
+      title: "Autoevaluación",
+      description: "Evalúa tus habilidades e intereses para descubrir caminos profesionales adecuados.",
+      startAssessment: "Comenzar Autoevaluación",
+      loading: "Cargando autoevaluación...",
+      error: "Error al cargar la autoevaluación.",
+    },
+    assessmentPage: {
+      title: "Evaluación",
+      submit: "Enviar",
+      next: "Siguiente",
+      previous: "Anterior",
+      loading: "Cargando preguntas...",
+      error: "Error al cargar las preguntas.",
+    },
+    dashboardPage: {
+      title: "Panel",
+      welcome: "¡Bienvenido a tu panel personalizado!",
+      progress: "Tu Progreso",
+      completedCourses: "Cursos Completados",
+      recommendedCourses: "Cursos Recomendados",
+      noCourses: "Aún no has completado ningún curso.",
+    },
+    continueLearning: {
+      title: "Continuar Aprendiendo",
+      subtitle: "Explora nuestros cursos seleccionados para mejorar tus habilidades y avanzar en tu carrera.",
+      loadingCourses: "Cargando cursos...",
+      errorLoading: "Error al cargar los cursos:",
+      noCourses: "No hay cursos disponibles por el momento.",
+      start: "Comenzar",
+      progressNote: "Tu progreso se guarda automáticamente a medida que completas cada nivel.",
+    },
+    notFound: {
+      title: "404 - Página No Encontrada",
+      message: "¡Oops! La página que estás buscando no existe.",
+      returnHome: "Volver al Inicio",
+    },
   },
   fr: {
-    // Header
-    'header.title': 'Apprendre l\'Anglais, Détendu',
-    'nav.home': 'Accueil',
-    'nav.selfAssessment': 'Auto-évaluation',
-    'nav.assessment': 'Évaluation',
-    'nav.courses': 'Cours',
-    'nav.dashboard': 'Tableau de bord',
-    'nav.manageCourses': 'Gérer les Cours',
-    'nav.apiKeys': 'Gestion des Clés API',
-    'auth.login': 'Se connecter',
-    'auth.logout': 'Se déconnecter',
-    'auth.account': 'Compte',
-    'auth.loading': 'Chargement...',
-    
-    // Home page
-    'home.title': 'Apprentissage de l\'Anglais Détendu',
-    'home.subtitle': 'Anglais simple et amusant pour tous. Évaluez-vous, découvrez vos forces et apprenez à votre rythme. 🎉',
-    'home.getStarted': 'Commencer',
-    'home.tryAssessment': 'Essayer l\'Auto-évaluation',
-    'home.noStress': 'Pas de stress. Pas de pression. Faible consommation de données, sauvegarde toujours vos progrès !',
-    'home.journeyTitle': 'Votre Parcours d\'Apprentissage',
-    'home.journey.selfAssessment': 'Auto-évaluation',
-    'home.journey.skills': 'Lecture, Écriture, Écoute, Expression orale',
-    'home.journey.dashboard': 'Tableau de bord : Suivez vos progrès',
-    'home.journey.resume': 'Reprendre à tout moment',
-    'home.journey.customized': 'Apprentissage personnalisé',
-    'curriculum.title': 'Programme d\'Exemple',
-    'curriculum.note': '(Le programme est personnalisable selon vos besoins.)',
-    
-    // Footer
-    'footer.text': 'Fait avec ❤️ pour les apprenants du monde entier.',
-    
-    // Skills
-    'skills.reading': 'Lecture 📚',
-    'skills.writing': 'Écriture ✏️',
-    'skills.listening': 'Écoute 🎧',
-    'skills.speaking': 'Expression orale 🗣️',
-
-    // Login page
-    'login.title': 'Se connecter à votre compte',
-    'login.createAccount': 'Créer un compte',
-    'login.firstName': 'Prénom',
-    'login.lastName': 'Nom',
-    'login.email': 'Email',
-    'login.password': 'Mot de passe',
-    'login.loginButton': 'Se connecter',
-    'login.signUpButton': 'S\'inscrire',
-    'login.noAccount': 'Vous n\'avez pas de compte ?',
-    'login.signUpLink': 'S\'inscrire',
-    'login.hasAccount': 'Vous avez déjà un compte ?',
-    'login.loginLink': 'Se connecter',
-    'login.note': 'Vous devrez connecter Supabase pour les fonctionnalités d\'authentification.',
-    'login.docs': 'Consultez la documentation Lovable pour les instructions.',
-
-    // Self Assessment page
-    'selfAssessment.title': 'Auto-évaluation',
-    'selfAssessment.subtitle': 'Comment vous évaluez-vous dans chaque compétence ? (1 = Débutant, 5 = Très confiant)',
-    'selfAssessment.saveButton': 'Sauvegarder et Continuer',
-    'selfAssessment.thankYou': 'Merci pour votre évaluation honnête !',
-    'selfAssessment.startTest': 'Commencer le Test de Compétences Anglaises →',
-
-    // Assessment page
-    'assessment.title': 'Évaluation des Compétences',
-    'assessment.selectLevel': 'Sélectionner le Niveau :',
-    'assessment.reading': 'Lecture',
-    'assessment.writing': 'Écriture',
-    'assessment.listening': 'Écoute',
-    'assessment.speaking': 'Expression orale',
-    'assessment.back': '← Retour',
-    'assessment.next': 'Suivant',
-    'assessment.finish': 'Terminer',
-    'assessment.complete': 'Évaluation Terminée !',
-    'assessment.completeMsg': 'Excellent travail pour avoir fait le premier pas ! Vos progrès apparaîtront dans votre tableau de bord.',
-    'assessment.viewDashboard': 'Voir le Tableau de bord',
-
-    // Dashboard page
-    'dashboard.title': 'Votre Tableau de bord',
-    'dashboard.subtitle': 'Bienvenue ! Ici vous verrez vos progrès et votre parcours d\'apprentissage.',
-    'dashboard.supabaseNote': '(Connectez Supabase pour suivre et sauvegarder vos résultats !)',
-    'dashboard.progress': 'Progrès :',
-    'dashboard.selfAssessment': 'Auto-évaluation :',
-    'dashboard.testScore': 'Score du Test :',
-    'dashboard.assessmentButton': 'Évaluation',
-    'dashboard.redoSelfAssessment': 'Refaire l\'Auto-évaluation',
-    'dashboard.viewAllCourses': 'Voir Tous les Cours',
-    'dashboard.tip': 'Conseil : Votre tableau de bord se met à jour chaque fois que vous terminez une auto-évaluation ou un test de compétences.',
-
-    // Continue Learning page
-    'continueLearning.title': 'Continuer l\'Apprentissage',
-    'continueLearning.subtitle': 'Choisissez un niveau pour commencer ou continuer votre parcours d\'apprentissage de l\'anglais !',
-    'continueLearning.loadingCourses': 'Chargement des cours...',
-    'continueLearning.noCourses': 'Aucun cours disponible pour l\'instant.',
-    'continueLearning.start': 'Commencer',
-    'continueLearning.progressNote': '(Vos progrès seront sauvegardés lorsque vous terminerez les évaluations pour chaque niveau !)',
-    'continueLearning.errorLoading': 'Échec du chargement des cours :',
-
-    // Admin pages
-    'admin.accessDenied': 'Accès Refusé',
-    'admin.mustBeAdmin': 'Vous devez être administrateur pour gérer les cours.',
-    'admin.mustBeAdminApiKeys': 'Vous devez être administrateur ou super administrateur pour gérer les clés API.',
-    'admin.coursesTitle': 'Gestion des Cours',
-    'admin.level': 'Niveau',
-    'admin.summary': 'Résumé',
-    'admin.actions': 'Actions',
-    'admin.edit': 'Modifier',
-    'admin.delete': 'Supprimer',
-    'admin.add': 'Ajouter un Cours',
-    'admin.update': 'Mettre à jour',
-    'admin.cancel': 'Annuler',
-    'admin.noCourses': 'Aucun cours pour l\'instant.',
-    'admin.apiKeysTitle': 'Gestion des Clés API',
-    'admin.apiKeysSubtitle': 'Gérer les clés API pour les intégrations.',
-    'admin.apiKeysNote': 'Pour un usage réel, un stockage sécurisé (ex. secrets Edge Functions) devrait être implémenté.',
-    'admin.addApiKey': 'Ajouter une Clé API',
-    'admin.apiKeyLabel': 'Libellé de la Clé API',
-    'admin.apiKeyValue': 'Valeur de la Clé API',
-    'admin.addKeyDemo': 'Ajouter une Clé (Démo Seulement)',
-    'admin.apiKeysComing': 'Gestion des clés API à venir : stocker, mettre à jour et supprimer les clés de manière sécurisée dans le backend.',
-
-    // 404 page
-    'notFound.title': '404',
-    'notFound.message': 'Oups ! Page non trouvée',
-    'notFound.returnHome': 'Retour à l\'Accueil',
+    header: {
+      title: "Plateforme d'Apprentissage",
+    },
+    nav: {
+      home: "Accueil",
+      selfAssessment: "Auto-évaluation",
+      assessment: "Évaluation",
+      courses: "Cours",
+      dashboard: "Tableau de bord",
+      manageCourses: "Gérer les cours",
+      apiKeys: "Clés API",
+      menu: "Menu"
+    },
+    home: {
+      title: "Libérez Votre Potentiel avec un Apprentissage Personnalisé",
+      subtitle:
+        "Embarquez pour une expérience d'apprentissage transformatrice adaptée à vos compétences et aspirations professionnelles. Commencez par une auto-évaluation, découvrez vos forces et tracez une voie vers la croissance professionnelle.",
+      getStarted: "Commencer",
+      tryAssessment: "Essayer une Auto-évaluation",
+      noStress: "Pas de stress, juste de la croissance. Faites le premier pas vers un avenir meilleur dès aujourd'hui !",
+      journeyTitle: "Votre Parcours d'Apprentissage",
+      journey: {
+        selfAssessment: "Commencez par une auto-évaluation",
+        skills: "Identifiez les compétences clés à développer",
+        dashboard: "Suivez vos progrès sur un tableau de bord personnalisé",
+        resume: "Construisez un CV exceptionnel",
+        customized: "Obtenez des recommandations d'apprentissage personnalisées"
+      }
+    },
+    auth: {
+      login: "Se Connecter",
+      logout: "Se Déconnecter",
+      account: "Compte",
+      loading: "Chargement...",
+    },
+    footer: {
+      text: "Donner du Pouvoir aux Carrières Grâce à la Connaissance",
+    },
+    selfAssessmentPage: {
+      title: "Auto-évaluation",
+      description: "Évaluez vos compétences et intérêts pour découvrir des parcours professionnels adaptés.",
+      startAssessment: "Commencer l'Auto-évaluation",
+      loading: "Chargement de l'auto-évaluation...",
+      error: "Erreur lors du chargement de l'auto-évaluation.",
+    },
+    assessmentPage: {
+      title: "Évaluation",
+      submit: "Soumettre",
+      next: "Suivant",
+      previous: "Précédent",
+      loading: "Chargement des questions...",
+      error: "Erreur lors du chargement des questions.",
+    },
+    dashboardPage: {
+      title: "Tableau de Bord",
+      welcome: "Bienvenue sur votre tableau de bord personnalisé !",
+      progress: "Vos Progrès",
+      completedCourses: "Cours Terminés",
+      recommendedCourses: "Cours Recommandés",
+      noCourses: "Aucun cours terminé pour le moment.",
+    },
+    continueLearning: {
+      title: "Continuer l'Apprentissage",
+      subtitle: "Explorez nos cours sélectionnés pour améliorer vos compétences et faire avancer votre carrière.",
+      loadingCourses: "Chargement des cours...",
+      errorLoading: "Erreur lors du chargement des cours :",
+      noCourses: "Aucun cours disponible pour le moment.",
+      start: "Commencer",
+      progressNote: "Vos progrès sont enregistrés automatiquement à mesure que vous terminez chaque niveau.",
+    },
+    notFound: {
+      title: "404 - Page Non Trouvée",
+      message: "Oops ! La page que vous recherchez n'existe pas.",
+      returnHome: "Retour à l'Accueil",
+    },
   },
   de: {
-    // Header
-    'header.title': 'Englisch lernen, Entspannt',
-    'nav.home': 'Startseite',
-    'nav.selfAssessment': 'Selbsteinschätzung',
-    'nav.assessment': 'Bewertung',
-    'nav.courses': 'Kurse',
-    'nav.dashboard': 'Dashboard',
-    'nav.manageCourses': 'Kurse verwalten',
-    'nav.apiKeys': 'API-Schlüssel-Verwaltung',
-    'auth.login': 'Anmelden',
-    'auth.logout': 'Abmelden',
-    'auth.account': 'Konto',
-    'auth.loading': 'Laden...',
-    
-    // Home page
-    'home.title': 'Entspanntes Englisch-Lernen',
-    'home.subtitle': 'Einfaches, spaßiges Englisch für alle. Bewerten Sie sich selbst, entdecken Sie Ihre Stärken und lernen Sie in Ihrem eigenen Tempo. 🎉',
-    'home.getStarted': 'Loslegen',
-    'home.tryAssessment': 'Selbsteinschätzung ausprobieren',
-    'home.noStress': 'Kein Stress. Kein Druck. Geringer Datenverbrauch, speichert immer Ihren Fortschritt!',
-    'home.journeyTitle': 'Ihre Lernreise',
-    'home.journey.selfAssessment': 'Selbsteinschätzung',
-    'home.journey.skills': 'Lesen, Schreiben, Hören, Sprechen',
-    'home.journey.dashboard': 'Dashboard: Verfolgen Sie Ihren Fortschritt',
-    'home.journey.resume': 'Jederzeit fortsetzen',
-    'home.journey.customized': 'Individuelles Lernen',
-    'curriculum.title': 'Beispiel-Lehrplan',
-    'curriculum.note': '(Der Lehrplan ist an Ihre Bedürfnisse anpassbar.)',
-    
-    // Footer
-    'footer.text': 'Mit ❤️ für Lernende überall gemacht.',
-    
-    // Skills
-    'skills.reading': 'Lesen 📚',
-    'skills.writing': 'Schreiben ✏️',
-    'skills.listening': 'Hören 🎧',
-    'skills.speaking': 'Sprechen 🗣️',
-
-    // Login page
-    'login.title': 'Bei Ihrem Konto anmelden',
-    'login.createAccount': 'Konto erstellen',
-    'login.firstName': 'Vorname',
-    'login.lastName': 'Nachname',
-    'login.email': 'E-Mail',
-    'login.password': 'Passwort',
-    'login.loginButton': 'Anmelden',
-    'login.signUpButton': 'Registrieren',
-    'login.noAccount': 'Sie haben noch kein Konto?',
-    'login.signUpLink': 'Registrieren',
-    'login.hasAccount': 'Sie haben bereits ein Konto?',
-    'login.loginLink': 'Anmelden',
-    'login.note': 'Sie müssen Supabase für Authentifizierungsfunktionen verbinden.',
-    'login.docs': 'Siehe Lovable-Dokumentation für Anweisungen.',
-
-    // Self Assessment page
-    'selfAssessment.title': 'Selbsteinschätzung',
-    'selfAssessment.subtitle': 'Wie bewerten Sie sich in jeder Fähigkeit? (1 = Gerade anfangend, 5 = Sehr zuversichtlich)',
-    'selfAssessment.saveButton': 'Speichern & Fortfahren',
-    'selfAssessment.thankYou': 'Vielen Dank für Ihre ehrliche Einschätzung!',
-    'selfAssessment.startTest': 'Englisch-Fähigkeitstest starten →',
-
-    // Assessment page
-    'assessment.title': 'Fähigkeitsbewertung',
-    'assessment.selectLevel': 'Niveau auswählen:',
-    'assessment.reading': 'Lesen',
-    'assessment.writing': 'Schreiben',
-    'assessment.listening': 'Hören',
-    'assessment.speaking': 'Sprechen',
-    'assessment.back': '← Zurück',
-    'assessment.next': 'Weiter',
-    'assessment.finish': 'Beenden',
-    'assessment.complete': 'Bewertung Abgeschlossen!',
-    'assessment.completeMsg': 'Großartige Arbeit beim ersten Schritt! Ihr Fortschritt wird in Ihrem Dashboard angezeigt.',
-    'assessment.viewDashboard': 'Dashboard anzeigen',
-
-    // Dashboard page
-    'dashboard.title': 'Ihr Dashboard',
-    'dashboard.subtitle': 'Willkommen! Hier sehen Sie Ihren Fortschritt und Ihre Lernreise.',
-    'dashboard.supabaseNote': '(Verbinden Sie Supabase, um Ihre Ergebnisse zu verfolgen und zu speichern!)',
-    'dashboard.progress': 'Fortschritt:',
-    'dashboard.selfAssessment': 'Selbsteinschätzung:',
-    'dashboard.testScore': 'Testergebnis:',
-    'dashboard.assessmentButton': 'Bewertung',
-    'dashboard.redoSelfAssessment': 'Selbsteinschätzung wiederholen',
-    'dashboard.viewAllCourses': 'Alle Kurse anzeigen',
-    'dashboard.tip': 'Tipp: Ihr Dashboard wird aktualisiert, wenn Sie eine Selbsteinschätzung oder einen Fähigkeitstest abschließen.',
-
-    // Continue Learning page
-    'continueLearning.title': 'Weiterlernen',
-    'continueLearning.subtitle': 'Wählen Sie ein Niveau, um Ihre Englisch-Lernreise zu beginnen oder fortzusetzen!',
-    'continueLearning.loadingCourses': 'Kurse werden geladen...',
-    'continueLearning.noCourses': 'Noch keine Kurse verfügbar.',
-    'continueLearning.start': 'Starten',
-    'continueLearning.progressNote': '(Ihr Fortschritt wird gespeichert, wenn Sie Bewertungen für jedes Niveau abschließen!)',
-    'continueLearning.errorLoading': 'Fehler beim Laden der Kurse:',
-
-    // Admin pages
-    'admin.accessDenied': 'Zugriff Verweigert',
-    'admin.mustBeAdmin': 'Sie müssen Administrator sein, um Kurse zu verwalten.',
-    'admin.mustBeAdminApiKeys': 'Sie müssen Administrator oder Super-Administrator sein, um API-Schlüssel zu verwalten.',
-    'admin.coursesTitle': 'Kursverwaltung',
-    'admin.level': 'Niveau',
-    'admin.summary': 'Zusammenfassung',
-    'admin.actions': 'Aktionen',
-    'admin.edit': 'Bearbeiten',
-    'admin.delete': 'Löschen',
-    'admin.add': 'Kurs hinzufügen',
-    'admin.update': 'Aktualisieren',
-    'admin.cancel': 'Abbrechen',
-    'admin.noCourses': 'Noch keine Kurse.',
-    'admin.apiKeysTitle': 'API-Schlüssel-Verwaltung',
-    'admin.apiKeysSubtitle': 'API-Schlüssel für Integrationen verwalten.',
-    'admin.apiKeysNote': 'Für den realen Einsatz sollte sichere Speicherung (z.B. Edge Functions Secrets) implementiert werden.',
-    'admin.addApiKey': 'API-Schlüssel hinzufügen',
-    'admin.apiKeyLabel': 'API-Schlüssel-Label',
-    'admin.apiKeyValue': 'API-Schlüssel-Wert',
-    'admin.addKeyDemo': 'Schlüssel hinzufügen (Nur Demo)',
-    'admin.apiKeysComing': 'API-Schlüssel-Verwaltung kommt bald: sichere Speicherung, Aktualisierung und Löschung von Schlüsseln im Backend.',
-
-    // 404 page
-    'notFound.title': '404',
-    'notFound.message': 'Ups! Seite nicht gefunden',
-    'notFound.returnHome': 'Zur Startseite zurückkehren',
+    header: {
+      title: "Lernplattform",
+    },
+    nav: {
+      home: "Startseite",
+      selfAssessment: "Selbstbewertung",
+      assessment: "Bewertung",
+      courses: "Kurse",
+      dashboard: "Dashboard",
+      manageCourses: "Kurse verwalten",
+      apiKeys: "API-Schlüssel",
+      menu: "Menü"
+    },
+    home: {
+      title: "Entfalten Sie Ihr Potenzial mit personalisiertem Lernen",
+      subtitle:
+        "Begeben Sie sich auf eine transformative Lernerfahrung, die auf Ihre individuellen Fähigkeiten und Karriereziele zugeschnitten ist. Beginnen Sie mit einer Selbstbewertung, entdecken Sie Ihre Stärken und steuern Sie einen Kurs in Richtung berufliches Wachstum.",
+      getStarted: "Loslegen",
+      tryAssessment: "Eine Selbstbewertung ausprobieren",
+      noStress: "Kein Stress, nur Wachstum. Machen Sie noch heute den ersten Schritt in eine bessere Zukunft!",
+      journeyTitle: "Ihre Lernreise",
+      journey: {
+        selfAssessment: "Beginnen Sie mit einer Selbstbewertung",
+        skills: "Identifizieren Sie wichtige Fähigkeiten, die Sie entwickeln sollten",
+        dashboard: "Verfolgen Sie Ihre Fortschritte auf einem personalisierten Dashboard",
+        resume: "Erstellen Sie einen herausragenden Lebenslauf",
+        customized: "Erhalten Sie individuelle Lernempfehlungen"
+      }
+    },
+    auth: {
+      login: "Anmelden",
+      logout: "Abmelden",
+      account: "Konto",
+      loading: "Laden...",
+    },
+    footer: {
+      text: "Karrieren durch Wissen fördern",
+    },
+    selfAssessmentPage: {
+      title: "Selbstbewertung",
+      description: "Bewerten Sie Ihre Fähigkeiten und Interessen, um geeignete Karrierewege zu entdecken.",
+      startAssessment: "Selbstbewertung starten",
+      loading: "Selbstbewertung wird geladen...",
+      error: "Fehler beim Laden der Selbstbewertung.",
+    },
+    assessmentPage: {
+      title: "Bewertung",
+      submit: "Absenden",
+      next: "Weiter",
+      previous: "Zurück",
+      loading: "Fragen werden geladen...",
+      error: "Fehler beim Laden der Fragen.",
+    },
+    dashboardPage: {
+      title: "Dashboard",
+      welcome: "Willkommen auf Ihrem persönlichen Dashboard!",
+      progress: "Ihr Fortschritt",
+      completedCourses: "Abgeschlossene Kurse",
+      recommendedCourses: "Empfohlene Kurse",
+      noCourses: "Noch keine Kurse abgeschlossen.",
+    },
+    continueLearning: {
+      title: "Weiterlernen",
+      subtitle: "Entdecken Sie unsere kuratierten Kurse, um Ihre Fähigkeiten zu verbessern und Ihre Karriere voranzutreiben.",
+      loadingCourses: "Kurse werden geladen...",
+      errorLoading: "Fehler beim Laden der Kurse:",
+      noCourses: "Im Moment sind keine Kurse verfügbar.",
+      start: "Starten",
+      progressNote: "Ihr Fortschritt wird automatisch gespeichert, wenn Sie jedes Level abschließen.",
+    },
+    notFound: {
+      title: "404 - Seite Nicht Gefunden",
+      message: "Ups! Die von Ihnen gesuchte Seite existiert nicht.",
+      returnHome: "Zurück zur Startseite",
+    },
   },
   it: {
-    // Header
-    'header.title': 'Impara l\'Inglese, Rilassato',
-    'nav.home': 'Home',
-    'nav.selfAssessment': 'Autovalutazione',
-    'nav.assessment': 'Valutazione',
-    'nav.courses': 'Corsi',
-    'nav.dashboard': 'Dashboard',
-    'nav.manageCourses': 'Gestisci Corsi',
-    'nav.apiKeys': 'Gestione Chiavi API',
-    'auth.login': 'Accedi',
-    'auth.logout': 'Esci',
-    'auth.account': 'Account',
-    'auth.loading': 'Caricamento...',
-    
-    // Home page
-    'home.title': 'Apprendimento dell\'Inglese Rilassato',
-    'home.subtitle': 'Inglese semplice e divertente per tutti. Valutati, scopri i tuoi punti di forza e impara al tuo ritmo. 🎉',
-    'home.getStarted': 'Inizia',
-    'home.tryAssessment': 'Prova l\'Autovalutazione',
-    'home.noStress': 'Niente stress. Nessuna pressione. Basso consumo dati, salva sempre i tuoi progressi!',
-    'home.journeyTitle': 'Il Tuo Viaggio di Apprendimento',
-    'home.journey.selfAssessment': 'Autovalutazione',
-    'home.journey.skills': 'Lettura, Scrittura, Ascolto, Parlato',
-    'home.journey.dashboard': 'Dashboard: Traccia i tuoi progressi',
-    'home.journey.resume': 'Riprendi in qualsiasi momento',
-    'home.journey.customized': 'Apprendimento personalizzato',
-    'curriculum.title': 'Curriculum di Esempio',
-    'curriculum.note': '(Il curriculum è personalizzabile per le tue esigenze.)',
-    
-    // Footer
-    'footer.text': 'Fatto con ❤️ per studenti di tutto il mondo.',
-    
-    // Skills
-    'skills.reading': 'Lettura 📚',
-    'skills.writing': 'Scrittura ✏️',
-    'skills.listening': 'Ascolto 🎧',
-    'skills.speaking': 'Parlato 🗣️',
-
-    // Login page
-    'login.title': 'Accedi al Tuo Account',
-    'login.createAccount': 'Crea un Account',
-    'login.firstName': 'Nome',
-    'login.lastName': 'Cognome',
-    'login.email': 'Email',
-    'login.password': 'Password',
-    'login.loginButton': 'Accedi',
-    'login.signUpButton': 'Registrati',
-    'login.noAccount': 'Non hai un account?',
-    'login.signUpLink': 'Registrati',
-    'login.hasAccount': 'Hai già un account?',
-    'login.loginLink': 'Accedi',
-    'login.note': 'Dovrai connettere Supabase per le funzionalità di autenticazione.',
-    'login.docs': 'Vedi la documentazione di Lovable per le istruzioni.',
-
-    // Self Assessment page
-    'selfAssessment.title': 'Autovalutazione',
-    'selfAssessment.subtitle': 'Come ti valuti in ogni abilità? (1 = Appena iniziato, 5 = Molto fiducioso)',
-    'selfAssessment.saveButton': 'Salva e Continua',
-    'selfAssessment.thankYou': 'Grazie per la tua valutazione onesta!',
-    'selfAssessment.startTest': 'Inizia il Test di Abilità Inglese →',
-
-    // Assessment page
-    'assessment.title': 'Valutazione delle Abilità',
-    'assessment.selectLevel': 'Seleziona Livello:',
-    'assessment.reading': 'Lettura',
-    'assessment.writing': 'Scrittura',
-    'assessment.listening': 'Ascolto',
-    'assessment.speaking': 'Parlato',
-    'assessment.back': '← Indietro',
-    'assessment.next': 'Avanti',
-    'assessment.finish': 'Termina',
-    'assessment.complete': 'Valutazione Completata!',
-    'assessment.completeMsg': 'Ottimo lavoro nel fare il primo passo! I tuoi progressi appariranno nella tua dashboard.',
-    'assessment.viewDashboard': 'Visualizza Dashboard',
-
-    // Dashboard page
-    'dashboard.title': 'La Tua Dashboard',
-    'dashboard.subtitle': 'Benvenuto! Qui vedrai i tuoi progressi e il tuo viaggio di apprendimento.',
-    'dashboard.supabaseNote': '(Connetti Supabase per tracciare e salvare i tuoi risultati!)',
-    'dashboard.progress': 'Progresso:',
-    'dashboard.selfAssessment': 'Autovalutazione:',
-    'dashboard.testScore': 'Punteggio Test:',
-    'dashboard.assessmentButton': 'Valutazione',
-    'dashboard.redoSelfAssessment': 'Rifai Autovalutazione',
-    'dashboard.viewAllCourses': 'Visualizza Tutti i Corsi',
-    'dashboard.tip': 'Suggerimento: La tua dashboard si aggiorna ogni volta che completi un\'autovalutazione o un test di abilità.',
-
-    // Continue Learning page
-    'continueLearning.title': 'Continua l\'Apprendimento',
-    'continueLearning.subtitle': 'Scegli un livello per iniziare o continuare il tuo viaggio di apprendimento inglese!',
-    'continueLearning.loadingCourses': 'Caricamento corsi...',
-    'continueLearning.noCourses': 'Nessun corso disponibile ancora.',
-    'continueLearning.start': 'Inizia',
-    'continueLearning.progressNote': '(I tuoi progressi saranno salvati quando completi le valutazioni per ogni livello!)',
-    'continueLearning.errorLoading': 'Errore nel caricamento dei corsi:',
-
-    // Admin pages
-    'admin.accessDenied': 'Accesso Negato',
-    'admin.mustBeAdmin': 'Devi essere un amministratore per gestire i corsi.',
-    'admin.mustBeAdminApiKeys': 'Devi essere un amministratore o super amministratore per gestire le chiavi API.',
-    'admin.coursesTitle': 'Gestione Corsi',
-    'admin.level': 'Livello',
-    'admin.summary': 'Riassunto',
-    'admin.actions': 'Azioni',
-    'admin.edit': 'Modifica',
-    'admin.delete': 'Elimina',
-    'admin.add': 'Aggiungi Corso',
-    'admin.update': 'Aggiorna',
-    'admin.cancel': 'Annulla',
-    'admin.noCourses': 'Nessun corso ancora.',
-    'admin.apiKeysTitle': 'Gestione Chiavi API',
-    'admin.apiKeysSubtitle': 'Gestisci le chiavi API per le integrazioni.',
-    'admin.apiKeysNote': 'Per uso reale, dovrebbe essere implementato uno storage sicuro (es. Edge Functions secrets).',
-    'admin.addApiKey': 'Aggiungi Chiave API',
-    'admin.apiKeyLabel': 'Etichetta Chiave API',
-    'admin.apiKeyValue': 'Valore Chiave API',
-    'admin.addKeyDemo': 'Aggiungi Chiave (Solo Demo)',
-    'admin.apiKeysComing': 'Gestione chiavi API in arrivo: memorizzazione sicura, aggiornamento ed eliminazione delle chiavi nel backend.',
-
-    // 404 page
-    'notFound.title': '404',
-    'notFound.message': 'Ops! Pagina non trovata',
-    'notFound.returnHome': 'Torna alla Home',
+    header: {
+      title: "Piattaforma di Apprendimento",
+    },
+    nav: {
+      home: "Home",
+      selfAssessment: "Autovalutazione",
+      assessment: "Valutazione",
+      courses: "Corsi",
+      dashboard: "Dashboard",
+      manageCourses: "Gestisci corsi",
+      apiKeys: "Chiavi API",
+      menu: "Menu"
+    },
+    home: {
+      title: "Sblocca il Tuo Potenziale con l'Apprendimento Personalizzato",
+      subtitle:
+        "Intraprendi un'esperienza di apprendimento trasformative su misura per le tue competenze e aspirazioni di carriera. Inizia con un'autovalutazione, scopri i tuoi punti di forza e traccia un percorso verso la crescita professionale.",
+      getStarted: "Inizia",
+      tryAssessment: "Prova un'Autovalutazione",
+      noStress: "Nessuno stress, solo crescita. Fai il primo passo verso un futuro migliore oggi stesso!",
+      journeyTitle: "Il Tuo Percorso di Apprendimento",
+      journey: {
+        selfAssessment: "Inizia con un'autovalutazione",
+        skills: "Identifica le competenze chiave da sviluppare",
+        dashboard: "Tieni traccia dei tuoi progressi su una dashboard personalizzata",
+        resume: "Costruisci un curriculum eccezionale",
+        customized: "Ottieni consigli di apprendimento personalizzati"
+      }
+    },
+    auth: {
+      login: "Accedi",
+      logout: "Esci",
+      account: "Account",
+      loading: "Caricamento...",
+    },
+    footer: {
+      text: "Potenziare le Carriere Attraverso la Conoscenza",
+    },
+    selfAssessmentPage: {
+      title: "Autovalutazione",
+      description: "Valuta le tue competenze e interessi per scoprire percorsi di carriera adatti.",
+      startAssessment: "Inizia Autovalutazione",
+      loading: "Caricamento autovalutazione...",
+      error: "Errore durante il caricamento dell'autovalutazione.",
+    },
+    assessmentPage: {
+      title: "Valutazione",
+      submit: "Invia",
+      next: "Avanti",
+      previous: "Indietro",
+      loading: "Caricamento domande...",
+      error: "Errore durante il caricamento delle domande.",
+    },
+    dashboardPage: {
+      title: "Dashboard",
+      welcome: "Benvenuto nella tua dashboard personalizzata!",
+      progress: "I Tuoi Progressi",
+      completedCourses: "Corsi Completati",
+      recommendedCourses: "Corsi Raccomandati",
+      noCourses: "Nessun corso completato finora.",
+    },
+    continueLearning: {
+      title: "Continua l'Apprendimento",
+      subtitle: "Esplora i nostri corsi curati per migliorare le tue competenze e far avanzare la tua carriera.",
+      loadingCourses: "Caricamento corsi...",
+      errorLoading: "Errore durante il caricamento dei corsi:",
+      noCourses: "Nessun corso disponibile al momento.",
+      start: "Inizia",
+      progressNote: "I tuoi progressi vengono salvati automaticamente man mano che completi ogni livello.",
+    },
+    notFound: {
+      title: "404 - Pagina Non Trovata",
+      message: "Oops! La pagina che stai cercando non esiste.",
+      returnHome: "Torna alla Home",
+    },
   },
   pt: {
-    // Header
-    'header.title': 'Aprenda Inglês, Relaxado',
-    'nav.home': 'Início',
-    'nav.selfAssessment': 'Autoavaliação',
-    'nav.assessment': 'Avaliação',
-    'nav.courses': 'Cursos',
-    'nav.dashboard': 'Painel',
-    'nav.manageCourses': 'Gerenciar Cursos',
-    'nav.apiKeys': 'Gerenciamento de Chaves API',
-    'auth.login': 'Entrar',
-    'auth.logout': 'Sair',
-    'auth.account': 'Conta',
-    'auth.loading': 'Carregando...',
-    
-    // Home page
-    'home.title': 'Aprendizado de Inglês Relaxado',
-    'home.subtitle': 'Inglês simples e divertido para todos. Avalie-se, descubra seus pontos fortes e aprenda no seu ritmo. 🎉',
-    'home.getStarted': 'Começar',
-    'home.tryAssessment': 'Experimentar Autoavaliação',
-    'home.noStress': 'Sem estresse. Sem pressão. Baixo consumo de dados, sempre salva seu progresso!',
-    'home.journeyTitle': 'Sua Jornada de Aprendizado',
-    'home.journey.selfAssessment': 'Autoavaliação',
-    'home.journey.skills': 'Leitura, Escrita, Escuta, Fala',
-    'home.journey.dashboard': 'Painel: Acompanhe seu progresso',
-    'home.journey.resume': 'Continue a qualquer momento',
-    'home.journey.customized': 'Aprendizado personalizado',
-    'curriculum.title': 'Currículo de Exemplo',
-    'curriculum.note': '(O currículo é personalizável para suas necessidades.)',
-    
-    // Footer
-    'footer.text': 'Feito com ❤️ para estudantes de todo o mundo.',
-    
-    // Skills
-    'skills.reading': 'Leitura 📚',
-    'skills.writing': 'Escrita ✏️',
-    'skills.listening': 'Escuta 🎧',
-    'skills.speaking': 'Fala 🗣️',
-
-    // Login page
-    'login.title': 'Entre na Sua Conta',
-    'login.createAccount': 'Criar uma Conta',
-    'login.firstName': 'Nome',
-    'login.lastName': 'Sobrenome',
-    'login.email': 'Email',
-    'login.password': 'Senha',
-    'login.loginButton': 'Entrar',
-    'login.signUpButton': 'Cadastrar',
-    'login.noAccount': 'Não tem uma conta?',
-    'login.signUpLink': 'Cadastre-se',
-    'login.hasAccount': 'Já tem uma conta?',
-    'login.loginLink': 'Entrar',
-    'login.note': 'Você precisará conectar o Supabase para recursos de autenticação.',
-    'login.docs': 'Veja a documentação do Lovable para instruções.',
-
-    // Self Assessment page
-    'selfAssessment.title': 'Autoavaliação',
-    'selfAssessment.subtitle': 'Como você se avalia em cada habilidade? (1 = Apenas começando, 5 = Muito confiante)',
-    'selfAssessment.saveButton': 'Salvar e Continuar',
-    'selfAssessment.thankYou': 'Obrigado pela sua avaliação honesta!',
-    'selfAssessment.startTest': 'Iniciar o Teste de Habilidades em Inglês →',
-
-    // Assessment page
-    'assessment.title': 'Avaliação de Habilidades',
-    'assessment.selectLevel': 'Selecionar Nível:',
-    'assessment.reading': 'Leitura',
-    'assessment.writing': 'Escrita',
-    'assessment.listening': 'Escuta',
-    'assessment.speaking': 'Fala',
-    'assessment.back': '← Voltar',
-    'assessment.next': 'Próximo',
-    'assessment.finish': 'Finalizar',
-    'assessment.complete': 'Avaliação Concluída!',
-    'assessment.completeMsg': 'Ótimo trabalho dando o primeiro passo! Seu progresso aparecerá no seu painel.',
-    'assessment.viewDashboard': 'Ver Painel',
-
-    // Dashboard page
-    'dashboard.title': 'Seu Painel',
-    'dashboard.subtitle': 'Bem-vindo! Aqui você verá seu progresso e jornada de aprendizado.',
-    'dashboard.supabaseNote': '(Conecte o Supabase para rastrear e salvar seus resultados!)',
-    'dashboard.progress': 'Progresso:',
-    'dashboard.selfAssessment': 'Autoavaliação:',
-    'dashboard.testScore': 'Pontuação do Teste:',
-    'dashboard.assessmentButton': 'Avaliação',
-    'dashboard.redoSelfAssessment': 'Refazer Autoavaliação',
-    'dashboard.viewAllCourses': 'Ver Todos os Cursos',
-    'dashboard.tip': 'Dica: Seu painel atualiza sempre que você completa uma autoavaliação ou teste de habilidades.',
-
-    // Continue Learning page
-    'continueLearning.title': 'Continuar Aprendendo',
-    'continueLearning.subtitle': 'Escolha um nível para começar ou continuar sua jornada de aprendizado de inglês!',
-    'continueLearning.loadingCourses': 'Carregando cursos...',
-    'continueLearning.noCourses': 'Nenhum curso disponível ainda.',
-    'continueLearning.start': 'Começar',
-    'continueLearning.progressNote': '(Seu progresso será salvo quando você completar avaliações para cada nível!)',
-    'continueLearning.errorLoading': 'Falha ao carregar cursos:',
-
-    // Admin pages
-    'admin.accessDenied': 'Acesso Negado',
-    'admin.mustBeAdmin': 'Você deve ser um administrador para gerenciar cursos.',
-    'admin.mustBeAdminApiKeys': 'Você deve ser um administrador ou super administrador para gerenciar chaves API.',
-    'admin.coursesTitle': 'Gerenciamento de Cursos',
-    'admin.level': 'Nível',
-    'admin.summary': 'Resumo',
-    'admin.actions': 'Ações',
-    'admin.edit': 'Editar',
-    'admin.delete': 'Excluir',
-    'admin.add': 'Adicionar Curso',
-    'admin.update': 'Atualizar',
-    'admin.cancel': 'Cancelar',
-    'admin.noCourses': 'Nenhum curso ainda.',
-    'admin.apiKeysTitle': 'Gerenciamento de Chaves API',
-    'admin.apiKeysSubtitle': 'Gerenciar chaves API para integrações.',
-    'admin.apiKeysNote': 'Para uso no mundo real, armazenamento seguro (ex. Edge Functions secrets) deve ser implementado.',
-    'admin.addApiKey': 'Adicionar Chave API',
-    'admin.apiKeyLabel': 'Rótulo da Chave API',
-    'admin.apiKeyValue': 'Valor da Chave API',
-    'admin.addKeyDemo': 'Adicionar Chave (Apenas Demo)',
-    'admin.apiKeysComing': 'Gerenciamento de chaves API em breve: armazenar, atualizar e excluir chaves com segurança no backend.',
-
-    // 404 page
-    'notFound.title': '404',
-    'notFound.message': 'Ops! Página não encontrada',
-    'notFound.returnHome': 'Voltar ao Início',
+    header: {
+      title: "Plataforma de Aprendizagem",
+    },
+    nav: {
+      home: "Início",
+      selfAssessment: "Autoavaliação",
+      assessment: "Avaliação",
+      courses: "Cursos",
+      dashboard: "Painel",
+      manageCourses: "Gerenciar cursos",
+      apiKeys: "Chaves API",
+      menu: "Menu"
+    },
+    home: {
+      title: "Desbloqueie Seu Potencial com Aprendizagem Personalizada",
+      subtitle:
+        "Embarque em uma experiência de aprendizado transformadora, adaptada às suas habilidades e aspirações de carreira. Comece com uma autoavaliação, descubra seus pontos fortes e trace um curso em direção ao crescimento profissional.",
+      getStarted: "Começar",
+      tryAssessment: "Experimentar uma Autoavaliação",
+      noStress: "Sem estresse, apenas crescimento. Dê o primeiro passo em direção a um futuro melhor hoje!",
+      journeyTitle: "Sua Jornada de Aprendizagem",
+      journey: {
+        selfAssessment: "Comece com uma autoavaliação",
+        skills: "Identifique as principais habilidades a serem desenvolvidas",
+        dashboard: "Acompanhe seu progresso em um painel personalizado",
+        resume: "Construa um currículo de destaque",
+        customized: "Obtenha recomendações de aprendizado personalizadas"
+      }
+    },
+    auth: {
+      login: "Entrar",
+      logout: "Sair",
+      account: "Conta",
+      loading: "Carregando...",
+    },
+    footer: {
+      text: "Capacitando Carreiras Através do Conhecimento",
+    },
+    selfAssessmentPage: {
+      title: "Autoavaliação",
+      description: "Avalie suas habilidades e interesses para descobrir caminhos de carreira adequados.",
+      startAssessment: "Iniciar Autoavaliação",
+      loading: "Carregando autoavaliação...",
+      error: "Erro ao carregar a autoavaliação.",
+    },
+    assessmentPage: {
+      title: "Avaliação",
+      submit: "Enviar",
+      next: "Próximo",
+      previous: "Anterior",
+      loading: "Carregando perguntas...",
+      error: "Erro ao carregar as perguntas.",
+    },
+    dashboardPage: {
+      title: "Painel",
+      welcome: "Bem-vindo ao seu painel personalizado!",
+      progress: "Seu Progresso",
+      completedCourses: "Cursos Concluídos",
+      recommendedCourses: "Cursos Recomendados",
+      noCourses: "Nenhum curso concluído ainda.",
+    },
+    continueLearning: {
+      title: "Continuar Aprendendo",
+      subtitle: "Explore nossos cursos selecionados para aprimorar suas habilidades e avançar em sua carreira.",
+      loadingCourses: "Carregando cursos...",
+      errorLoading: "Erro ao carregar os cursos:",
+      noCourses: "Nenhum curso disponível no momento.",
+      start: "Começar",
+      progressNote: "Seu progresso é salvo automaticamente à medida que você conclui cada nível.",
+    },
+    notFound: {
+      title: "404 - Página Não Encontrada",
+      message: "Oops! A página que você está procurando não existe.",
+      returnHome: "Voltar para a Página Inicial",
+    },
   },
   zh: {
-    // Header
-    'header.title': '轻松学英语',
-    'nav.home': '首页',
-    'nav.selfAssessment': '自我评估',
-    'nav.assessment': '评估',
-    'nav.courses': '课程',
-    'nav.dashboard': '仪表板',
-    'nav.manageCourses': '管理课程',
-    'nav.apiKeys': 'API密钥管理',
-    'auth.login': '登录',
-    'auth.logout': '退出',
-    'auth.account': '账户',
-    'auth.loading': '加载中...',
-    
-    // Home page
-    'home.title': '轻松英语学习',
-    'home.subtitle': '简单有趣的英语，适合每个人。评估自己，发现优势，按自己的节奏学习。🎉',
-    'home.getStarted': '开始',
-    'home.tryAssessment': '尝试自我评估',
-    'home.noStress': '无压力。无负担。低数据使用，始终保存您的进度！',
-    'home.journeyTitle': '您的学习之旅',
-    'home.journey.selfAssessment': '自我评估',
-    'home.journey.skills': '阅读、写作、听力、口语',
-    'home.journey.dashboard': '仪表板：跟踪您的进度',
-    'home.journey.resume': '随时继续',
-    'home.journey.customized': '个性化学习',
-    'curriculum.title': '示例课程',
-    'curriculum.note': '（课程可根据您的需求定制。）',
-    
-    // Footer
-    'footer.text': '用❤️为世界各地的学习者制作。',
-    
-    // Skills
-    'skills.reading': '阅读 📚',
-    'skills.writing': '写作 ✏️',
-    'skills.listening': '听力 🎧',
-    'skills.speaking': '口语 🗣️',
-
-    // Login page
-    'login.title': '登录您的账户',
-    'login.createAccount': '创建账户',
-    'login.firstName': '名字',
-    'login.lastName': '姓氏',
-    'login.email': '邮箱',
-    'login.password': '密码',
-    'login.loginButton': '登录',
-    'login.signUpButton': '注册',
-    'login.noAccount': '没有账户？',
-    'login.signUpLink': '注册',
-    'login.hasAccount': '已有账户？',
-    'login.loginLink': '登录',
-    'login.note': '您需要连接Supabase以使用身份验证功能。',
-    'login.docs': '查看Lovable文档获取说明。',
-
-    // Self Assessment page
-    'selfAssessment.title': '自我评估',
-    'selfAssessment.subtitle': '您如何评估自己的每项技能？（1 = 刚开始，5 = 非常自信）',
-    'selfAssessment.saveButton': '保存并继续',
-    'selfAssessment.thankYou': '感谢您的诚实评估！',
-    'selfAssessment.startTest': '开始英语技能测试 →',
-
-    // Assessment page
-    'assessment.title': '技能评估',
-    'assessment.selectLevel': '选择级别：',
-    'assessment.reading': '阅读',
-    'assessment.writing': '写作',
-    'assessment.listening': '听力',
-    'assessment.speaking': '口语',
-    'assessment.back': '← 返回',
-    'assessment.next': '下一个',
-    'assessment.finish': '完成',
-    'assessment.complete': '评估完成！',
-    'assessment.completeMsg': '迈出第一步很棒！您的进度将显示在仪表板中。',
-    'assessment.viewDashboard': '查看仪表板',
-
-    // Dashboard page
-    'dashboard.title': '您的仪表板',
-    'dashboard.subtitle': '欢迎！这里您将看到您的进度和学习旅程。',
-    'dashboard.supabaseNote': '（连接Supabase以跟踪和保存您的结果！）',
-    'dashboard.progress': '进度：',
-    'dashboard.selfAssessment': '自我评估：',
-    'dashboard.testScore': '测试分数：',
-    'dashboard.assessmentButton': '评估',
-    'dashboard.redoSelfAssessment': '重做自我评估',
-    'dashboard.viewAllCourses': '查看所有课程',
-    'dashboard.tip': '提示：每当您完成自我评估或技能测试时，您的仪表板都会更新。',
-
-    // Continue Learning page
-    'continueLearning.title': '继续学习',
-    'continueLearning.subtitle': '选择一个级别开始或继续您的英语学习之旅！',
-    'continueLearning.loadingCourses': '加载课程中...',
-    'continueLearning.noCourses': '暂无可用课程。',
-    'continueLearning.start': '开始',
-    'continueLearning.progressNote': '（当您完成每个级别的评估时，您的进度将被保存！）',
-    'continueLearning.errorLoading': '加载课程失败：',
-
-    // Admin pages
-    'admin.accessDenied': '拒绝访问',
-    'admin.mustBeAdmin': '您必须是管理员才能管理课程。',
-    'admin.mustBeAdminApiKeys': '您必须是管理员或超级管理员才能管理API密钥。',
-    'admin.coursesTitle': '课程管理',
-    'admin.level': '级别',
-    'admin.summary': '摘要',
-    'admin.actions': '操作',
-    'admin.edit': '编辑',
-    'admin.delete': '删除',
-    'admin.add': '添加课程',
-    'admin.update': '更新',
-    'admin.cancel': '取消',
-    'admin.noCourses': '暂无课程。',
-    'admin.apiKeysTitle': 'API密钥管理',
-    'admin.apiKeysSubtitle': '管理集成的API密钥。',
-    'admin.apiKeysNote': '对于实际使用，应实现安全存储（例如Edge Functions secrets）。',
-    'admin.addApiKey': '添加API密钥',
-    'admin.apiKeyLabel': 'API密钥标签',
-    'admin.apiKeyValue': 'API密钥值',
-    'admin.addKeyDemo': '添加密钥（仅演示）',
-    'admin.apiKeysComing': 'API密钥管理即将推出：在后端安全存储、更新和删除密钥。',
-
-    // 404 page
-    'notFound.title': '404',
-    'notFound.message': '哎呀！找不到页面',
-    'notFound.returnHome': '返回首页',
+    header: {
+      title: "学习平台",
+    },
+    nav: {
+      home: "首页",
+      selfAssessment: "自我评估",
+      assessment: "评估",
+      courses: "课程",
+      dashboard: "仪表板",
+      manageCourses: "管理课程",
+      apiKeys: "API密钥",
+      menu: "菜单"
+    },
+    home: {
+      title: "通过个性化学习释放您的潜力",
+      subtitle:
+        "开始一次变革性的学习体验，该体验根据您的独特技能和职业抱负量身定制。 从自我评估开始，发现自己的优势，并规划通往职业发展的道路。",
+      getStarted: "开始",
+      tryAssessment: "尝试自我评估",
+      noStress: "没有压力，只有成长。 今天就迈出迈向更美好未来的第一步！",
+      journeyTitle: "您的学习之旅",
+      journey: {
+        selfAssessment: "从自我评估开始",
+        skills: "确定要发展的关键技能",
+        dashboard: "在个性化仪表板上跟踪您的进度",
+        resume: "建立出色的简历",
+        customized: "获得定制的学习建议"
+      }
+    },
+    auth: {
+      login: "登录",
+      logout: "登出",
+      account: "帐户",
+      loading: "加载中...",
+    },
+    footer: {
+      text: "通过知识赋能职业",
+    },
+    selfAssessmentPage: {
+      title: "自我评估",
+      description: "评估您的技能和兴趣，以发现合适的职业道路。",
+      startAssessment: "开始自我评估",
+      loading: "正在加载自我评估...",
+      error: "无法加载自我评估。",
+    },
+    assessmentPage: {
+      title: "评估",
+      submit: "提交",
+      next: "下一个",
+      previous: "上一个",
+      loading: "正在加载问题...",
+      error: "无法加载问题。",
+    },
+    dashboardPage: {
+      title: "仪表板",
+      welcome: "欢迎来到您的个性化仪表板！",
+      progress: "你的进步",
+      completedCourses: "已完成的课程",
+      recommendedCourses: "推荐课程",
+      noCourses: "尚未完成任何课程。",
+    },
+    continueLearning: {
+      title: "继续学习",
+      subtitle: "探索我们精选的课程，以提高您的技能并提升您的职业生涯。",
+      loadingCourses: "正在加载课程...",
+      errorLoading: "加载课程时出错：",
+      noCourses: "目前没有可用的课程。",
+      start: "开始",
+      progressNote: "当您完成每个级别时，您的进度会自动保存。",
+    },
+    notFound: {
+      title: "404 - 页面未找到",
+      message: "糟糕！ 您要查找的页面不存在。",
+      returnHome: "返回首页",
+    },
   },
   ja: {
-    // Header
-    'header.title': 'リラックス英語学習',
-    'nav.home': 'ホーム',
-    'nav.selfAssessment': '自己評価',
-    'nav.assessment': '評価',
-    'nav.courses': 'コース',
-    'nav.dashboard': 'ダッシュボード',
-    'nav.manageCourses': 'コース管理',
-    'nav.apiKeys': 'APIキー管理',
-    'auth.login': 'ログイン',
-    'auth.logout': 'ログアウト',
-    'auth.account': 'アカウント',
-    'auth.loading': '読み込み中...',
-    
-    // Home page
-    'home.title': 'リラックス英語学習',
-    'home.subtitle': 'みんなのためのシンプルで楽しい英語。自己評価し、強みを発見し、自分のペースで学習しましょう。🎉',
-    'home.getStarted': '始める',
-    'home.tryAssessment': '自己評価を試す',
-    'home.noStress': 'ストレスなし。プレッシャーなし。低データ使用量、常に進捗を保存！',
-    'home.journeyTitle': 'あなたの学習の旅',
-    'home.journey.selfAssessment': '自己評価',
-    'home.journey.skills': 'リーディング、ライティング、リスニング、スピーキング',
-    'home.journey.dashboard': 'ダッシュボード：進捗を追跡',
-    'home.journey.resume': 'いつでも再開',
-    'home.journey.customized': 'カスタマイズされた学習',
-    'curriculum.title': 'サンプルカリキュラム',
-    'curriculum.note': '（カリキュラムはあなたのニーズに合わせてカスタマイズ可能です。）',
-    
-    // Footer
-    'footer.text': '世界中の学習者のために❤️で作られました。',
-    
-    // Skills
-    'skills.reading': 'リーディング 📚',
-    'skills.writing': 'ライティング ✏️',
-    'skills.listening': 'リスニング 🎧',
-    'skills.speaking': 'スピーキング 🗣️',
-
-    // Login page
-    'login.title': 'アカウントにログイン',
-    'login.createAccount': 'アカウントを作成',
-    'login.firstName': '名前',
-    'login.lastName': '苗字',
-    'login.email': 'メール',
-    'login.password': 'パスワード',
-    'login.loginButton': 'ログイン',
-    'login.signUpButton': 'サインアップ',
-    'login.noAccount': 'アカウントをお持ちでないですか？',
-    'login.signUpLink': 'サインアップ',
-    'login.hasAccount': 'すでにアカウントをお持ちですか？',
-    'login.loginLink': 'ログイン',
-    'login.note': '認証機能を使用するにはSupabaseを接続する必要があります。',
-    'login.docs': '手順については、Lovableドキュメントを参照してください。',
-
-    // Self Assessment page
-    'selfAssessment.title': '自己評価',
-    'selfAssessment.subtitle': '各スキルをどのように評価しますか？（1 = 始めたばかり、5 = とても自信がある）',
-    'selfAssessment.saveButton': '保存して続行',
-    'selfAssessment.thankYou': '正直な評価をありがとうございます！',
-    'selfAssessment.startTest': '英語スキルテストを開始 →',
-
-    // Assessment page
-    'assessment.title': 'スキル評価',
-    'assessment.selectLevel': 'レベル選択：',
-    'assessment.reading': 'リーディング',
-    'assessment.writing': 'ライティング',
-    'assessment.listening': 'リスニング',
-    'assessment.speaking': 'スピーキング',
-    'assessment.back': '← 戻る',
-    'assessment.next': '次へ',
-    'assessment.finish': '完了',
-    'assessment.complete': '評価完了！',
-    'assessment.completeMsg': '最初の一歩を踏み出すという素晴らしい仕事をしました！あなたの進捗はダッシュボードに表示されます。',
-    'assessment.viewDashboard': 'ダッシュボードを表示',
-
-    // Dashboard page
-    'dashboard.title': 'あなたのダッシュボード',
-    'dashboard.subtitle': 'ようこそ！ここであなたの進捗と学習の旅を見ることができます。',
-    'dashboard.supabaseNote': '（結果を追跡・保存するためにSupabaseを接続してください！）',
-    'dashboard.progress': '進捗：',
-    'dashboard.selfAssessment': '自己評価：',
-    'dashboard.testScore': 'テストスコア：',
-    'dashboard.assessmentButton': '評価',
-    'dashboard.redoSelfAssessment': '自己評価をやり直す',
-    'dashboard.viewAllCourses': 'すべてのコースを表示',
-    'dashboard.tip': 'ヒント：自己評価やスキルテストを完了するたびに、ダッシュボードが更新されます。',
-
-    // Continue Learning page
-    'continueLearning.title': '学習を続ける',
-    'continueLearning.subtitle': 'レベルを選択して英語学習の旅を始めたり続けたりしましょう！',
-    'continueLearning.loadingCourses': 'コース読み込み中...',
-    'continueLearning.noCourses': 'まだ利用可能なコースはありません。',
-    'continueLearning.start': '開始',
-    'continueLearning.progressNote': '（各レベルの評価を完了すると、進捗が保存されます！）',
-    'continueLearning.errorLoading': 'コースの読み込みに失敗しました：',
-
-    // Admin pages
-    'admin.accessDenied': 'アクセス拒否',
-    'admin.mustBeAdmin': 'コースを管理するには管理者である必要があります。',
-    'admin.mustBeAdminApiKeys': 'APIキーを管理するには管理者またはスーパー管理者である必要があります。',
-    'admin.coursesTitle': 'コース管理',
-    'admin.level': 'レベル',
-    'admin.summary': '概要',
-    'admin.actions': 'アクション',
-    'admin.edit': '編集',
-    'admin.delete': '削除',
-    'admin.add': 'コース追加',
-    'admin.update': '更新',
-    'admin.cancel': 'キャンセル',
-    'admin.noCourses': 'まだコースがありません。',
-    'admin.apiKeysTitle': 'APIキー管理',
-    'admin.apiKeysSubtitle': '統合のためのAPIキーを管理します。',
-    'admin.apiKeysNote': '実際の使用には、安全なストレージ（例：Edge Functions secrets）を実装する必要があります。',
-    'admin.addApiKey': 'APIキー追加',
-    'admin.apiKeyLabel': 'APIキーラベル',
-    'admin.apiKeyValue': 'APIキー値',
-    'admin.addKeyDemo': 'キー追加（デモのみ）',
-    'admin.apiKeysComing': 'APIキー管理機能準備中：バックエンドでキーの安全な保存、更新、削除。',
-
-    // 404 page
-    'notFound.title': '404',
-    'notFound.message': 'おっと！ページが見つかりません',
-    'notFound.returnHome': 'ホームに戻る',
+    header: {
+      title: "学習プラットフォーム",
+    },
+    nav: {
+      home: "ホーム",
+      selfAssessment: "自己評価",
+      assessment: "評価",
+      courses: "コース",
+      dashboard: "ダッシュボード",
+      manageCourses: "コース管理",
+      apiKeys: "APIキー",
+      menu: "メニュー"
+    },
+    home: {
+      title: "パーソナライズされた学習であなたの可能性を解き放ちましょう",
+      subtitle:
+        "あなたのユニークなスキルとキャリアの願望に合わせて調整された、変革的な学習体験に乗り出しましょう。 自己評価から始めて、自分の強みを発見し、専門能力開発への道筋を描きましょう。",
+      getStarted: "始めましょう",
+      tryAssessment: "自己評価を試す",
+      noStress: "ストレスはなく、成長のみです。 今日、より明るい未来への第一歩を踏み出しましょう！",
+      journeyTitle: "あなたの学習の旅",
+      journey: {
+        selfAssessment: "自己評価から始める",
+        skills: "開発すべき重要なスキルを特定する",
+        dashboard: "パーソナライズされたダッシュボードで進捗状況を追跡する",
+        resume: "傑出した履歴書を作成する",
+        customized: "カスタマイズされた学習の推奨事項を入手する"
+      }
+    },
+    auth: {
+      login: "ログイン",
+      logout: "ログアウト",
+      account: "アカウント",
+      loading: "読み込み中...",
+    },
+    footer: {
+      text: "知識を通じてキャリアを支援する",
+    },
+    selfAssessmentPage: {
+      title: "自己評価",
+      description: "あなたのスキルと興味を評価して、適切なキャリアパスを見つけてください。",
+      startAssessment: "自己評価を開始する",
+      loading: "自己評価をロードしています...",
+      error: "自己評価のロードに失敗しました。",
+    },
+    assessmentPage: {
+      title: "評価",
+      submit: "送信",
+      next: "次へ",
+      previous: "前へ",
+      loading: "質問をロードしています...",
+      error: "質問のロードに失敗しました。",
+    },
+    dashboardPage: {
+      title: "ダッシュボード",
+      welcome: "パーソナライズされたダッシュボードへようこそ！",
+      progress: "あなたの進捗状況",
+      completedCourses: "完了したコース",
+      recommendedCourses: "おすすめコース",
+      noCourses: "まだ完了したコースはありません。",
+    },
+    continueLearning: {
+      title: "学習を続ける",
+      subtitle: "厳選されたコースを探索して、スキルを向上させ、キャリアを向上させましょう。",
+      loadingCourses: "コースをロードしています...",
+      errorLoading: "コースのロード中にエラーが発生しました：",
+      noCourses: "現在利用できるコースはありません。",
+      start: "開始",
+      progressNote: "各レベルを完了すると、進捗状況が自動的に保存されます。",
+    },
+    notFound: {
+      title: "404 - ページが見つかりません",
+      message: "おっと！ お探しのページは存在しません。",
+      returnHome: "ホームページに戻る",
+    },
   },
 };
 
-export const TranslationProvider = ({ children }: { children: ReactNode }) => {
-  const [language, setLanguage] = useState<Language>('en');
+export const TranslationProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const [language, setLanguage] = useState<string>((localStorage.getItem('language') || 'en'));
+
+  useEffect(() => {
+    localStorage.setItem('language', language);
+  }, [language]);
 
   const t = (key: string): string => {
-    return translations[language][key] || key;
+    const keys = key.split('.');
+    let value: any = translations[language as keyof typeof translations];
+    for (const k of keys) {
+      if (value && typeof value === 'object' && k in value) {
+        value = value[k as keyof typeof value];
+      } else {
+        console.warn(`Translation key "${key}" not found in language "${language}"`);
+        return key;
+      }
+    }
+    return typeof value === 'string' ? value : key;
   };
 
   return (
@@ -1027,10 +655,10 @@ export const TranslationProvider = ({ children }: { children: ReactNode }) => {
   );
 };
 
-export const useTranslation = () => {
+export const useTranslation = (): TranslationContextProps => {
   const context = useContext(TranslationContext);
-  if (context === undefined) {
-    throw new Error('useTranslation must be used within a TranslationProvider');
+  if (!context) {
+    throw new Error("useTranslation must be used within a TranslationProvider");
   }
   return context;
 };
